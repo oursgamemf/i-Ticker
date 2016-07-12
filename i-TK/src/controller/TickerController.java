@@ -29,32 +29,8 @@ public class TickerController {
         return newTk;
         
     }
-    
-    public static boolean isInternetReachable()
-        {
-            try {
-
-                InetAddress address = InetAddress.getByName("www.google.it");
-
-                if(address == null)
-                {
-                    return false;
-                }
-
-            } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        }
-    
-    public boolean getConnection() throws UnknownHostException, IOException{
+      
+    public boolean getConnection() {
         try {
                 //make a URL to a known source
                 URL url = new URL("http://www.google.com");
@@ -68,12 +44,12 @@ public class TickerController {
 
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                //e.printStackTrace();
                 return false;
             }
             catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                //e.printStackTrace();
                 return false;
             }
             return true;
