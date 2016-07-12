@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +28,16 @@ public class DBtk {
     private static String sJdbc = "jdbc:sqlite";
     private static String sDbUrl = sJdbc + ":" + sTempDb;
     private static int iTimeout = 30;
-    private static String sMakeTable = "CREATE TABLE dummy (id numeric, response text)";
+    private static String sDropTable = "DROP TABLE " +  sTempDb + ";";
+    private static String sMakeTable = "CREATE TABLE "+ sTempDb  +
+                                        " (ID INT PRIMARY KEY NOT NULL," +
+                                        " DATE_TK DATE, " + 
+                                        " OPEN_TK NUMBER(8,2), " + 
+                                        " HIGH_TK NUMBER(8,2), " + 
+                                        " LOW_TK NUMBER(8,2), " + 
+                                        " CLOSE_TK NUMBER(8,2), " + 
+                                        " VOLUME_TK NUMBER(8,2), " + 
+                                        " ADJ_TK NUMBER(8,2))"; 
     private static String sMakeInsert = "INSERT INTO dummy VALUES(1,'Hello from the database')";
     private static String sMakeSelect = "SELECT response from dummy";
 
@@ -40,10 +50,28 @@ public class DBtk {
             Logger.getLogger(DBtk.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public static void dropTable() {
+        preConn();
+        Statement stat = null;
+        try (Connection conn = DriverManager.getConnection(sDbUrl)) {
+            if (conn != null) {
+                DatabaseMetaData meta = conn.getMetaData();
+                stat = conn.createStatement();
+                stat.executeUpdate(sDropTable);
+                System.out.println("A table has been deleted.");
+            }
+            else
+                System.out.println("No DB detected.");
 
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
     public static void createNewDatabase() {
         preConn();
-        try (Connection conn = DriverManager.getConnection(sDbUrl)) {
+        try (Connection conn = DriverManager.getConnection(sDbUrl);) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
                 System.out.println("The driver name is " + meta.getDriverName());
@@ -77,12 +105,26 @@ public class DBtk {
             }
         }
     }
-
+       
+    public static void fillDB(String insertData){
+        preConn(); 
+        try(Connection conn = DriverManager.getConnection(sDbUrl);){
+            try(Statement stat = conn.createStatement();){
+                stat.executeUpdate(insertData);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtk.class.getName()).log(Level.SEVERE, null, ex);
+        }
+     
+       
+            
+            
+    }
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //createNewDatabase();
+
         connect();
     }
 
