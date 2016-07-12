@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 /**
  * @author emanuele
@@ -22,6 +23,27 @@ import java.net.UnknownHostException;
 public class TickerController {
     
     private static String hostnameOrIP = "https://www.google.it";
+    
+    public static ArrayList<String> getColumnFromIndex(int colIndex, ArrayList<ArrayList<String>> datas) {
+        // Retun all values of a column except the first one (header: name of the column)
+        
+        ArrayList<String> values = new ArrayList<String>();
+        for (int row = 1; datas.get(row).get(colIndex) != null; row++) {
+            //System.out.println(datas.get(i).get(colSel));
+            values.add(datas.get(row).get(colIndex));
+            try {
+                datas.get(row + 1).get(colIndex);
+            } catch (NullPointerException e) {
+                return values;
+            } catch (IndexOutOfBoundsException e) {
+                return values;
+            }
+        }
+        return values;
+        
+    }
+    
+    
     public static String getTicker(String tk){
         // Remove space outside words
         
