@@ -38,11 +38,13 @@ public class ManageExcel {
     }
     
    
-    public static int getColNumFromTxt(String hederName, ArrayList<ArrayList<String>> datas) {
+    public static int getColNumFromTxt(String headerName, ArrayList<ArrayList<String>> datas) {
+        //Return the index of the column whose header name is "headerName"
+        
         int i = 0;
         for (i = 0; i < datas.get(0).size(); i++) {
             //System.out.println(datas.get(0).get(i));
-            if (datas.get(0).get(i).toString().toLowerCase().equals(hederName.toLowerCase())) {
+            if (datas.get(0).get(i).toString().toLowerCase().equals(headerName.toLowerCase())) {
                 return i;
             }
         }
@@ -50,6 +52,8 @@ public class ManageExcel {
     }
 
     public static HashSet<String> getListOfValue(int colSel, ArrayList<ArrayList<String>> datas) {
+        // Return all values of a column (colSel) without repetitions
+        
         HashSet<String> typeOf = new HashSet<String>();
         for (int i = 1; datas.get(i).get(colSel) != null; i++) {
             //System.out.println(datas.get(i).get(colSel));
@@ -64,24 +68,10 @@ public class ManageExcel {
         }
         return typeOf;
     }
-
-    public static int getRowNumFromData() {
-        return 1;
-    }
-
-    public static ArrayList<String> getTT(String numInterv, String incAttiv, ArrayList<ArrayList<String>> datas) {
-        ArrayList<String> aTT = new ArrayList<String>();
-        String myParam = "";
-        if (numInterv != null) {
-            myParam = numInterv;
-        } else {
-            myParam = incAttiv;
-        }
-        // Here call fun to get index of a TT getRow(String aa, Int col);
-        return aTT;
-    }
     
     public static int getRowsData(ArrayList<ArrayList<String>> datas){
+        // Get number of rows in "datas" (header included)
+        
         int i = 0;
         int retVal = 0;
         while ((datas.get(i).get(0) != null) && (datas.get(i).get(0) != "")){
@@ -91,7 +81,9 @@ public class ManageExcel {
     }
     
     public static ArrayList<ArrayList<String>> getAllDataFromFile() {
-        try (CSVReader reader = new CSVReader(new FileReader(inputFile), ';');) {
+        // Get datas from csv file to ArrayList of ArrayList
+        
+        try (CSVReader reader = new CSVReader(new FileReader(inputFile), ',');) {
             String[] nextLine;
             int numRow = 0;
             while ((nextLine = reader.readNext()) != null && numRow < 8000) {
@@ -115,6 +107,8 @@ public class ManageExcel {
     }
     
     public static ArrayList<String> getHeaderList(ArrayList<ArrayList<String>> allData){
+        // Return an array storing each header (column name) of "allData"
+        
         ArrayList<String> myHeader = new ArrayList<>();
         for (int i = 0; i < allData.get(0).size(); i++) {
             if ((allData.get(0).get(i) != null) && (!"".equals(allData.get(0).get(i))) ){
@@ -123,11 +117,21 @@ public class ManageExcel {
         }
         return myHeader;
     }
+    
+    public static String getColNameFromIndex(int index, ArrayList<ArrayList<String>> datas) {
+        //Return the name of the column whose column index is "index"
+        
+        String columnHeaderName = datas.get(0).get(index);
+        return columnHeaderName;
+    }
+    
+    
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        setInputFile("C:\\Users\\emanuele.calabro\\Documents\\SVG\\Data Fix\\MyTool\\dataSource.csv");
+        setInputFile("C:\\Users\\virginia\\Desktop\\Progettino finanza\\table.csv");
         ArrayList<ArrayList<String>> data = getAllDataFromFile();
 //        HashSet<String> setOfData = getListOfValue(getColNumFromTxt("descrizione intervento", data), data);
 //        System.out.println(setOfData.size() + "\n -----------");
