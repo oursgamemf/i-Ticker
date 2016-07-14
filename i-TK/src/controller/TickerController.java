@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -24,12 +25,12 @@ public class TickerController {
     
     private static String hostnameOrIP = "https://www.google.it";
     
+    // NO
     public static ArrayList<String> getColumnFromIndex(int colIndex, ArrayList<ArrayList<String>> datas) {
-        // Retun all values of a column except the first one (header: name of the column)
+        // Retun all values of a column except the first one (header -> name of the column)
         
         ArrayList<String> values = new ArrayList<String>();
         for (int row = 1; datas.get(row).get(colIndex) != null; row++) {
-            //System.out.println(datas.get(i).get(colSel));
             values.add(datas.get(row).get(colIndex));
             try {
                 datas.get(row + 1).get(colIndex);
@@ -42,6 +43,45 @@ public class TickerController {
         return values;
         
     }
+    
+    //NO
+    public static ArrayList<Double> string2DoubleArray(int colIndex, ArrayList<String> datas) {
+        // Change type of the elements of the array into Double
+        
+        ArrayList<Double> values = new ArrayList<>();
+        for (int row = 0; datas.get(row) != null; row++) {
+            
+            Double value = Double.valueOf(datas.get(row));
+            values.add(value);
+            try {
+                datas.get(row + 1);
+            } catch (NullPointerException | IndexOutOfBoundsException e) {
+                return values;
+            }
+        }
+        return values;
+    }
+    
+    //N0
+    public static ArrayList<Date> string2DateArray(int colIndex, ArrayList<String> datas) {
+        // Change type of the elements of the array into Date
+        
+        ArrayList<Date> values = new ArrayList<>();
+        for (int row = 0; datas.get(row) != null; row++) {
+            
+            Date value = Date.valueOf(datas.get(row));
+            values.add(value);
+            try {
+                datas.get(row + 1);
+            } catch (NullPointerException | IndexOutOfBoundsException e) {
+                return values;
+            }
+        }
+        return values;
+        
+    }
+    
+    
     
     
     public static String getTicker(String tk){
