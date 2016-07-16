@@ -96,12 +96,12 @@ public class ViewTicker extends javax.swing.JFrame {
             }
         });
         
-        String ticker = tkC.getTicker(" asdfg   ");
-        System.out.println(ticker);
-        
-
-        Boolean connection = tkC.getWebConnection();
-        System.out.println(connection);
+//        String ticker = tkC.getTicker(" asdfg   ");
+//        System.out.println(ticker);
+//        
+//
+//        Boolean connection = tkC.getWebConnection();
+//        System.out.println(connection);
     }
     
 

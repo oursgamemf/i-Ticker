@@ -85,10 +85,10 @@ public class ManageExcel {
         return retVal;
     }
     
-    public static ArrayList<ArrayList<String>> getAllDataFromFile() {
+    public static ArrayList<ArrayList<String>> getAllDataFromFile(char sep) {
         // Get datas from csv file to ArrayList of ArrayList
         
-        try (CSVReader reader = new CSVReader(new FileReader(inputFile), ',');) {
+        try (CSVReader reader = new CSVReader(new FileReader(inputFile), sep);) {
             String[] nextLine;
             int numRow = 0;
             while ((nextLine = reader.readNext()) != null && numRow < 8000) {
@@ -137,7 +137,7 @@ public class ManageExcel {
      */
     public static void main(String[] args) {
         setInputFile("C:\\Users\\virginia\\Desktop\\Progettino finanza\\table.csv");
-        ArrayList<ArrayList<String>> data = getAllDataFromFile();
+        ArrayList<ArrayList<String>> data = getAllDataFromFile(',');
 //        HashSet<String> setOfData = getListOfValue(getColNumFromTxt("descrizione intervento", data), data);
 //        System.out.println(setOfData.size() + "\n -----------");
 //        for (String tip : setOfData) {

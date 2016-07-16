@@ -148,12 +148,13 @@ public class TickerController {
         String sourceFullPath = curPath.getParent().toString()+ File.separator + PATH_TO_CONFIG; //.getParent()
         System.out.println(sourceFullPath);
         setInputFile(curPath.getParent().toString()+ File.separator + PATH_TO_CONFIG);
-        ArrayList<ArrayList<String>> configData = getAllDataFromFile();
+        ArrayList<ArrayList<String>> configData = getAllDataFromFile(';');
         DBtkEvo sessionDB = new DBtkEvo();
         // Data from file
+        System.out.println("size config" + configData.size());
         sessionDB.setsDBname(configData.get(0).get(1));
         sessionDB.setsTable(configData.get(1).get(1));
-        sessionDB.setsFieldTableCreate(configData.get(1).get(1));
+        sessionDB.setsFieldTableCreate(configData.get(2).get(1));
         //sessionDB.createTable();
         System.out.println(sessionDB.getsDBname());
         System.out.println(sessionDB.getsTable());
