@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static model.DBtk.driverConn;
 
 public class DBtkEvo {
 
@@ -34,7 +33,7 @@ public class DBtkEvo {
             Class.forName(sJdbc);
             return true;
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DBtk.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
