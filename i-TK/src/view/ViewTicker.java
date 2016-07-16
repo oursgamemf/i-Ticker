@@ -5,8 +5,13 @@
  */
 package view;
 
+import static controller.ManageExcel.setInputFile;
 import controller.TickerController;
+import static controller.TickerController.runMeAtStart;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import model.DBtkEvo;
 
 /**
  *
@@ -83,7 +88,7 @@ public class ViewTicker extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ViewTicker.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+         runMeAtStart();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -95,7 +100,7 @@ public class ViewTicker extends javax.swing.JFrame {
         System.out.println(ticker);
         
 
-        Boolean connection = tkC.getConnection();
+        Boolean connection = tkC.getWebConnection();
         System.out.println(connection);
     }
     
