@@ -9,8 +9,9 @@ package controller;
 
 import com.opencsv.CSVReader;
 import static controller.TickerController.getColumnFromIndex;
-import static controller.TickerController.string2DoubleArray;
-import static controller.TickerController.string2DateArray;
+import static controller.TickerController.string2DoubleArray;//NO
+import static controller.TickerController.string2DateArray;//NO
+import static controller.TickerController.getRowTickerArray;//??
 import controller.RowTicker;
 import java.io.BufferedReader;
 import java.io.File;
@@ -117,7 +118,8 @@ public class ManageExcel {
         ArrayList<String> myHeader = new ArrayList<>();
         for (int i = 0; i < allData.get(0).size(); i++) {
             if ((allData.get(0).get(i) != null) && (!"".equals(allData.get(0).get(i))) ){
-            myHeader.add(allData.get(0).get(i));
+            myHeader.add(allData.get(0).get(i).toLowerCase().trim());
+            // Comtempla caso più spazi tra "adj close"
             }
         }
         return myHeader;
@@ -143,60 +145,8 @@ public class ManageExcel {
 //        for (String tip : setOfData) {
 //            System.out.println(tip);
 //        }
-        ArrayList<String> headers = getHeaderList(data);
-        //for (String in : headers ){
-        //    System.out.println(in);
-        //}
-        //System.out.println(headers.size());
-        
-        ArrayList<RowTicker> myTicker = new ArrayList<RowTicker>();
-        Integer colNumber = headers.size();
-        
-        for (int row = 1; data.get(row) != null; row++) {
-            
-            RowTicker myRowTicker = new RowTicker();
-            
-            for (String h: headers){
-                Integer col = getColNumFromTxt(h, data);
-                switch (h.toLowerCase()){
-                    case "date":
-                        Date dateVal = Date.valueOf(data.get(row).get(col));
-                        myRowTicker.setDateTk(dateVal);
-                        break;
-                    case "open":
-                        Double openVal = Double.valueOf(data.get(row).get(col));
-                        myRowTicker.setOpenTk(openVal);
-                        break;
-                    case "high":
-                        Double highVal = Double.valueOf(data.get(row).get(col));
-                        myRowTicker.setHighTk(highVal);
-                        break;
-                    case "low":
-                        Double lowVal = Double.valueOf(data.get(row).get(col));
-                        myRowTicker.setLowTk(lowVal);
-                        break;
-                    case "close":
-                        Double closeVal = Double.valueOf(data.get(row).get(col));
-                        myRowTicker.setCloseTk(closeVal);
-                        break;
-                    case "volume":
-                        Double volumeVal = Double.valueOf(data.get(row).get(col));
-                        myRowTicker.setVolumeTk(volumeVal);
-                        break;
-                    case "adj close":
-                        Double adjCloseVal = Double.valueOf(data.get(row).get(col));
-                        myRowTicker.setAdjCloseTk(adjCloseVal);
-                        break;
-                }
-            }
-            
-            myTicker.add(myRowTicker);
-            try {
-                data.get(row + 1);
-            } catch (NullPointerException | IndexOutOfBoundsException e) {
-                break;
-            }
-        }
+
+    ArrayList<RowTicker> myTicker = getRowTickerArray(data);
     
     Integer index = 80;
     System.out.println("Date: " + myTicker.get(index).getDateTk());
