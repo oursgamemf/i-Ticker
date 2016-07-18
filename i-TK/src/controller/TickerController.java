@@ -155,10 +155,9 @@ public class TickerController {
         sessionDB.setsDBname(configData.get(0).get(1));
         sessionDB.setsTable(configData.get(1).get(1));
         sessionDB.setsFieldTableCreate(configData.get(2).get(1));
-        //sessionDB.createTable();
-        System.out.println(sessionDB.getsDBname());
-        System.out.println(sessionDB.getsTable());
-        System.out.println(sessionDB.getsFieldTableCreate());
+        sessionDB.setQuery(configData.get(3).get(1));
+        sessionDB.createTable();
+        
         return sessionDB;
     }
 

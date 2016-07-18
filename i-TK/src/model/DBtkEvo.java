@@ -3,13 +3,17 @@ package model;
 /**
  * @author emanuele
  */
+import controller.RowTicker;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +30,15 @@ public class DBtkEvo {
     private static String sInsertWhere;
     private static String sInsertValue;
     private static String sMakeInsert = "INSERT INTO " + sDBname + "(" + sInsertWhere + ")" + " VALUES(" + sInsertValue + ")";
+    private static String query = "UPDATE EMPLOYEES SET SALARY = ? WHERE ID = ?";
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        DBtkEvo.query = query;
+    }
 
     public boolean driverConn() {
         // register the driver 
@@ -39,8 +52,9 @@ public class DBtkEvo {
     }
 
     public Connection connectOrCreate() {
-        if (sDBname == null)
+        if (sDBname == null) {
             return null;
+        }
         driverConn();
         Connection conn = null;
         try {
@@ -101,8 +115,9 @@ public class DBtkEvo {
     }
 
     public boolean createTable() {
-        if ((sTable==null)||(sFieldTableCreate==null))
+        if ((sTable == null) || (sFieldTableCreate == null)) {
             return false;
+        }
         Connection conn = connectOrCreate();
         try (Statement stat = conn.createStatement();) {
             stat.executeUpdate(sMakeTable);
@@ -132,6 +147,32 @@ public class DBtkEvo {
         }
         return numInsRow; // nows inserted
 
+    }
+
+    public boolean insertRowTKinDB(ArrayList<RowTicker> information, String query) {
+        Connection conn = connectOrCreate();
+
+        boolean createSuccessful = false;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query);) {
+            Date a = new Date(iTimeout);
+            java.sql.Date sysDate = new java.sql.Date(a.getTime());
+            for (RowTicker rowTT : information) {              
+                pstmt.setString(0, sTable);
+                pstmt.setDate(1, sysDate);
+                pstmt.setInt(2, 110592);
+                pstmt.setInt(3, 110592);
+                pstmt.setInt(4, 110592);
+                pstmt.setInt(5, 110592);
+                pstmt.setInt(6, 110592);
+                pstmt.setInt(7, 110592);
+                pstmt.execute();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return createSuccessful;
     }
 
 }
