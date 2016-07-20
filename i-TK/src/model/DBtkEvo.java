@@ -16,21 +16,24 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sqlite.SQLite;
 
 public class DBtkEvo {
 
     private static String sDBname;// = "tk";
-    private static final String sJdbc = "jdbc:sqlite";
-    private static String sDbUrl = sJdbc + ":" + sDBname + ".db";
+    private static final String sJdbc = "org.sqlite.JDBC";
+    private static String sDbUrl = "jdbc:sqlite:";
+    private static final String DB_EXTENSION = ".db";
     private static int iTimeout = 30;
-    private static String sDropTable = "DROP TABLE " + sDBname + ";";
+    private static String sDropTable = "DROP TABLE ";
     private static String sFieldTableCreate;
     private static String sTable;
-    private static String sMakeTable = "CREATE TABLE " + sTable + "(" + sFieldTableCreate + ")";
+    private static String sMakeTable = "CREATE TABLE ";
     private static String sInsertWhere;
     private static String sInsertValue;
     private static String sMakeInsert = "INSERT INTO " + sDBname + "(" + sInsertWhere + ")" + " VALUES(" + sInsertValue + ")";
-    private static String query = "UPDATE EMPLOYEES SET SALARY = ? WHERE ID = ?";
+    private static String query = null;
+    private static final String INSERT = "INSERT INTO ";
 
     public String getQuery() {
         return query;
@@ -55,12 +58,15 @@ public class DBtkEvo {
         if (sDBname == null) {
             return null;
         }
-        driverConn();
+        if(!driverConn())
+            System.out.println("No DB driver found");
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(sDbUrl);
+            conn = DriverManager.getConnection(sDbUrl + getsDBname() + DB_EXTENSION );
+            
             return conn;
         } catch (SQLException ex) {
+            System.out.println("No DB driver found");
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return conn;
@@ -116,19 +122,33 @@ public class DBtkEvo {
 
     public boolean createTable() {
         if ((sTable == null) || (sFieldTableCreate == null)) {
+            System.out.println("nullVAlue");
             return false;
         }
         Connection conn = connectOrCreate();
-        try (Statement stat = conn.createStatement();) {
-            stat.executeUpdate(sMakeTable);
-            conn.close();
+        String createTableDML = sMakeTable+ getsTable() + " (" +getsFieldTableCreate()+ ");";
+        try (PreparedStatement pstmt = conn.prepareStatement(createTableDML);) {
+            pstmt.executeUpdate();
+            
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
-
+    
+    public void dropTable(){
+        Connection conn = connectOrCreate();
+        String dropTableDML = sDropTable + getsTable() + ";";
+        try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
+            System.out.println(dropTableDML);
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
     public int fillTable(String DB, String nameTable, String insertColName, String insertValue[]) {
         setsTable(nameTable);
         setsInsertWhere(insertColName);
@@ -153,26 +173,34 @@ public class DBtkEvo {
         Connection conn = connectOrCreate();
 
         boolean createSuccessful = false;
-
-        try (PreparedStatement pstmt = conn.prepareStatement(query);) {
+        String pstmtUpdate = INSERT + getsTable() + query + ";";
+        System.out.println(pstmtUpdate);
+        try (PreparedStatement pstmt = conn.prepareStatement(pstmtUpdate);) {
             Date a = new Date(iTimeout);
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
             for (RowTicker rowTT : information) {              
-                pstmt.setString(0, sTable);
                 pstmt.setDate(1, sysDate);
-                pstmt.setInt(2, 110592);
-                pstmt.setInt(3, 110592);
-                pstmt.setInt(4, 110592);
-                pstmt.setInt(5, 110592);
-                pstmt.setInt(6, 110592);
-                pstmt.setInt(7, 110592);
+                System.out.println(sysDate);
+                pstmt.setDate(2, rowTT.getDateTk());
+                System.out.println(rowTT.getDateTk());
+                pstmt.setDouble(3, rowTT.getOpenTk());
+                System.out.println(rowTT.getOpenTk());
+                pstmt.setDouble(4, rowTT.getHighTk());
+                pstmt.setDouble(5, rowTT.getLowTk());
+                pstmt.setDouble(6, rowTT.getCloseTk());
+                pstmt.setDouble(7, rowTT.getVolumeTk());
                 pstmt.execute();
             }
+            conn.commit();
+
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return createSuccessful;
     }
+    
+ 
+    
 
 }

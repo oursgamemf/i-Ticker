@@ -88,7 +88,6 @@ public class ManageExcel {
     
     public static ArrayList<ArrayList<String>> getAllDataFromFile(char sep) {
         // Get datas from csv file to ArrayList of ArrayList
-        
         try (CSVReader reader = new CSVReader(new FileReader(inputFile), sep);) {
             String[] nextLine;
             int numRow = 0;
@@ -99,7 +98,30 @@ public class ManageExcel {
                 }
                 allData.add(allRow);
                 numRow += 1;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManageExcel.class
+                    .getName()).log(Level.SEVERE, null, ex);
 
+        } catch (IOException ex) {
+            Logger.getLogger(ManageExcel.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+        return allData;
+    }
+    
+    public static ArrayList<ArrayList<String>> getAllDataFromFile( String csvInputPath, char sep) {
+        // Get datas from csv file to ArrayList of ArrayList
+        try (CSVReader reader = new CSVReader(new FileReader(csvInputPath), sep);) {
+            String[] nextLine;
+            int numRow = 0;
+            while ((nextLine = reader.readNext()) != null && numRow < 8000) {
+                ArrayList<String> allRow = new ArrayList<String>();
+                for (String cell : nextLine) {
+                    allRow.add(cell);
+                }
+                allData.add(allRow);
+                numRow += 1;
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ManageExcel.class
@@ -138,14 +160,13 @@ public class ManageExcel {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        setInputFile("C:\\Users\\virginia\\Desktop\\Progettino finanza\\table.csv");
         ArrayList<ArrayList<String>> data = getAllDataFromFile(',');
 //        HashSet<String> setOfData = getListOfValue(getColNumFromTxt("descrizione intervento", data), data);
 //        System.out.println(setOfData.size() + "\n -----------");
 //        for (String tip : setOfData) {
 //            System.out.println(tip);
 //        }
-
+        
     ArrayList<RowTicker> myTicker = getRowTickerArray(data);
     
     Integer index = 80;

@@ -5,12 +5,17 @@
  */
 package view;
 
+import static controller.ManageExcel.getAllDataFromFile;
+import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
+import controller.RowTicker;
 import controller.TickerController;
+import static controller.TickerController.getRowTickerArray;
 import static controller.TickerController.runMeAtStart;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import model.DBtkEvo;
 
 /**
@@ -18,8 +23,9 @@ import model.DBtkEvo;
  * @author virginia
  */
 public class ViewTicker extends javax.swing.JFrame {
-    
+
     public static TickerController tkC = new TickerController();
+
     /**
      * Creates new form ViewTicker
      */
@@ -88,14 +94,24 @@ public class ViewTicker extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ViewTicker.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-         runMeAtStart();
+        DBtkEvo myStmtDB = runMeAtStart(); 
+        ArrayList<ArrayList<String>> data = getAllDataFromFile(TickerController.getCsvFullPath(),',');
+        //ArrayList<RowTicker> myTicker = getRowTickerArray(data);
+        for(String test: getHeaderList(data)){
+            System.out.println("myTest " + test);
+        }
+        
+//        for (RowTicker rt : myTicker){
+//            System.out.println(rt.getDateTk());
+//        }
+        //myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ViewTicker().setVisible(true);
             }
         });
-        
+
 //        String ticker = tkC.getTicker(" asdfg   ");
 //        System.out.println(ticker);
 //        
@@ -103,7 +119,7 @@ public class ViewTicker extends javax.swing.JFrame {
 //        Boolean connection = tkC.getWebConnection();
 //        System.out.println(connection);
     }
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField jTextField1;

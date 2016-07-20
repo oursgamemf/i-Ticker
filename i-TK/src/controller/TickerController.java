@@ -33,6 +33,20 @@ public class TickerController {
 
     private static final String URL_TEST_CONN = "https://www.google.it";
     private static final String PATH_TO_CONFIG = "i_tk.config";
+    private static final String PATH_TO_CSV = "table.csv";
+    private static final String opSys = System.getProperty("os.name");  
+    private static final Path curPath = Paths.get(System.getProperty("user.dir"));
+    private static final String configFullPath = curPath.getParent().toString()+ File.separator + PATH_TO_CONFIG;
+    private static final String csvFullPath = curPath.getParent().toString()+ File.separator + PATH_TO_CSV;
+
+    public static String getConfigFullPath() {
+        return configFullPath;
+    }
+
+    public static String getCsvFullPath() {
+        return csvFullPath;
+    }
+
 
     // NO
     public static ArrayList<String> getColumnFromIndex(int colIndex, ArrayList<ArrayList<String>> datas) {
@@ -155,21 +169,18 @@ public class TickerController {
     // ManageFile
     public static DBtkEvo runMeAtStart() {
         //Linux
-        String opSys = System.getProperty("os.name");  
-        Path curPath = Paths.get(System.getProperty("user.dir"));
-        String sourceFullPath = curPath.getParent().toString()+ File.separator + PATH_TO_CONFIG; //.getParent()
-        System.out.println(sourceFullPath);
-        setInputFile(curPath.getParent().toString()+ File.separator + PATH_TO_CONFIG);
-        ArrayList<ArrayList<String>> configData = getAllDataFromFile(';');
+         //.getParent()
+        ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath,';');
         DBtkEvo sessionDB = new DBtkEvo();
-        // Data from file
-        System.out.println("size config" + configData.size());
         sessionDB.setsDBname(configData.get(0).get(1));
         sessionDB.setsTable(configData.get(1).get(1));
         sessionDB.setsFieldTableCreate(configData.get(2).get(1));
-        sessionDB.setQuery(configData.get(3).get(1));
-        sessionDB.createTable();
+        sessionDB.setQuery(configData.get(3).get(1));    
         
+        sessionDB.connectOrCreate();
+        sessionDB.dropTable();
+        sessionDB.createTable();
+ 
         return sessionDB;
     }
     
