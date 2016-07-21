@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 public class ManageExcel {
 
     private static String inputFile;
-    private static ArrayList<ArrayList<String>> allData = new ArrayList<ArrayList<String>>();
 
     public static void setInputFile(String inputFile) {
         ManageExcel.inputFile = inputFile;
@@ -87,6 +86,7 @@ public class ManageExcel {
     }
     
     public static ArrayList<ArrayList<String>> getAllDataFromFile(char sep) {
+        ArrayList<ArrayList<String>> allData = new ArrayList<>();
         // Get datas from csv file to ArrayList of ArrayList
         try (CSVReader reader = new CSVReader(new FileReader(inputFile), sep);) {
             String[] nextLine;
@@ -112,6 +112,7 @@ public class ManageExcel {
     
     public static ArrayList<ArrayList<String>> getAllDataFromFile( String csvInputPath, char sep) {
         // Get datas from csv file to ArrayList of ArrayList
+        ArrayList<ArrayList<String>> allData = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new FileReader(csvInputPath), sep);) {
             String[] nextLine;
             int numRow = 0;

@@ -34,6 +34,7 @@ public class DBtkEvo {
     private static String sMakeInsert = "INSERT INTO " + sDBname + "(" + sInsertWhere + ")" + " VALUES(" + sInsertValue + ")";
     private static String query = null;
     private static final String INSERT = "INSERT INTO ";
+    private static final String SELECT_ALL = "SELECT * FROM ";
 
     public String getQuery() {
         return query;
@@ -168,13 +169,26 @@ public class DBtkEvo {
         return numInsRow; // nows inserted
 
     }
-
+    
+    public RowTicker getAllFromDBData(){
+        RowTicker rtFromDB = new RowTicker();
+        Connection conn = connectOrCreate();
+        String pstmtSelect = SELECT_ALL + getsTable() + ";";
+        try (Statement stmt = conn.createStatement();) {
+            ResultSet rs = stmt.executeQuery(pstmtSelect);
+            while (rs.next()) {
+                rtFromDB.setDateTk(rs.getDate("dateTk"));           
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return rtFromDB;
+    }
+    
     public boolean insertRowTKinDB(ArrayList<RowTicker> information, String query) {
         Connection conn = connectOrCreate();
-
         boolean createSuccessful = false;
         String pstmtUpdate = INSERT + getsTable() + query + ";";
-        System.out.println(pstmtUpdate);
         try (PreparedStatement pstmt = conn.prepareStatement(pstmtUpdate);) {
             Date a = new Date(iTimeout);
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
@@ -191,7 +205,6 @@ public class DBtkEvo {
                 pstmt.setDouble(7, rowTT.getVolumeTk());
                 pstmt.execute();
             }
-            conn.commit();
 
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
