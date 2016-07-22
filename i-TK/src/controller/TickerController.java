@@ -10,7 +10,10 @@ import static controller.ManageExcel.getColNumFromTxt;
 import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.sql.Date;
 import java.net.Socket;
@@ -20,10 +23,13 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import model.DBtkEvo;
 
 /**
@@ -34,10 +40,16 @@ public class TickerController {
     private static final String URL_TEST_CONN = "https://www.google.it";
     private static final String PATH_TO_CONFIG = "i_tk.config";
     private static final String PATH_TO_CSV = "table.csv";
-    private static final String opSys = System.getProperty("os.name");  
+    private static final String PATH_TO_DWL = "myDwlFile.html";
+    private static final String opSys = System.getProperty("os.name");
     private static final Path curPath = Paths.get(System.getProperty("user.dir"));
-    private static final String configFullPath = curPath.getParent().toString()+ File.separator + PATH_TO_CONFIG;
-    private static final String csvFullPath = curPath.getParent().toString()+ File.separator + PATH_TO_CSV;
+    private static final String configFullPath = curPath.getParent().toString() + File.separator + PATH_TO_CONFIG;
+    private static final String csvFullPath = curPath.getParent().toString() + File.separator + PATH_TO_CSV;
+    private static final String dwlFullPath = curPath.getParent().toString() + File.separator + PATH_TO_DWL;
+
+    public static String getDwlFullPath() {
+        return dwlFullPath;
+    }
 
     public static String getConfigFullPath() {
         return configFullPath;
@@ -46,7 +58,6 @@ public class TickerController {
     public static String getCsvFullPath() {
         return csvFullPath;
     }
-
 
     // NO
     public static ArrayList<String> getColumnFromIndex(int colIndex, ArrayList<ArrayList<String>> datas) {
@@ -133,33 +144,6 @@ public class TickerController {
         return true;
     }
 
-    public String makeURL(String tk) {
-        // Compose full URL
-
-        String url = "real-chart.finance.yahoo.com/table.csv?s=";
-        url = url + tk;
-        url = url + "&a=01&b=01&c=1900&d=12&e=12&f=2116&g=m&ignore=.csv";
-        
-        return url;
-    }
-
-    public String makeURL(String tk, Date startDate, Date stopDate) {
-        // Compose full URL
-        String url = "real-chart.finance.yahoo.com/table.csv?s=";
-        url = url + tk;
-        String starting, ending;
-        url = url + "&a=01&b=01&c=1900&d=12&e=12&f=2116&g=m&ignore=.csv";
-        
-        return url;
-    }
-
-    public Boolean searchTK(String myUrl) {
-        // connect and try to download
-        // add to BD
-        // run Manage File
-        return false;
-    }
-
     public boolean addTKToDB(RowTicker TK, DBtkEvo dbInterface) {
         // Date sysDate, int dayNextUpDate
         // Campi del DB : id, tickerName, InsertDateWithMS, 
@@ -169,35 +153,35 @@ public class TickerController {
     // ManageFile
     public static DBtkEvo runMeAtStart() {
         //Linux
-         //.getParent()
-        ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath,';');
+        //.getParent()
+        ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath, ';');
         DBtkEvo sessionDB = new DBtkEvo();
         sessionDB.setsDBname(configData.get(0).get(1));
         sessionDB.setsTable(configData.get(1).get(1));
         sessionDB.setsFieldTableCreate(configData.get(2).get(1));
-        sessionDB.setQuery(configData.get(3).get(1));    
-        
+        sessionDB.setQuery(configData.get(3).get(1));
+
         sessionDB.connectOrCreate();
         sessionDB.dropTable();
         sessionDB.createTable();
- 
+
         return sessionDB;
     }
-    
+
     public static ArrayList<RowTicker> getRowTickerArray(ArrayList<ArrayList<String>> datas) {
         // Return an Array whose elements are instances of the class RowTicker.
-        
+
         ArrayList<RowTicker> myTicker = new ArrayList<RowTicker>();
         ArrayList<String> headers = getHeaderList(datas);
         Integer colNumber = headers.size();
-        
+
         for (int row = 1; datas.get(row) != null; row++) {
-            
+
             RowTicker myRowTicker = new RowTicker();
-            
-            for (String h: headers){
+
+            for (String h : headers) {
                 Integer col = getColNumFromTxt(h, datas);
-                switch (h.toLowerCase().trim()){
+                switch (h.toLowerCase().trim()) {
                     case "date":
                         Date dateVal = Date.valueOf(datas.get(row).get(col));
                         myRowTicker.setDateTk(dateVal);
@@ -228,7 +212,7 @@ public class TickerController {
                         break;
                 }
             }
-            
+
             myTicker.add(myRowTicker);
             try {
                 datas.get(row + 1);
@@ -239,4 +223,68 @@ public class TickerController {
         return myTicker;
     }
 
+    public static String makeURL(String tk) {
+        // Compose full URL
+
+        String url = "file://real-chart.finance.yahoo.com/table.csv?s=";
+        url = url + tk;
+        url = url + "&a=01&b=01&c=1900&d=12&e=12&f=2116&g=m&ignore=.csv";
+
+        return url;
+    }
+
+    public static String makeURL(String tk, Date startDate, Date stopDate) throws UnsupportedEncodingException {
+        // Compose full URL
+        String url = "file://real-chart.finance.yahoo.com/table.csv?s=";
+        url = url + tk;
+
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(startDate);
+        String startYear = String.valueOf(startCal.get(Calendar.YEAR));
+        String startMonth = String.valueOf(startCal.get(Calendar.MONTH));
+        if (startMonth.length() == 1) {
+            startMonth = "0" + startMonth;
+        }
+        String startDay = String.valueOf(startCal.get(Calendar.DAY_OF_MONTH));
+        if (startDay.length() == 1) {
+            startDay = "0" + startDay;
+        }
+
+        Calendar stopCal = Calendar.getInstance();
+        stopCal.setTime(stopDate);
+        String stopYear = String.valueOf(stopCal.get(Calendar.YEAR));
+        String stopMonth = String.valueOf(stopCal.get(Calendar.MONTH));
+        if (stopMonth.length() == 1) {
+            stopMonth = "0" + stopMonth;
+        }
+        String stopDay = String.valueOf(stopCal.get(Calendar.DAY_OF_MONTH));
+        if (stopDay.length() == 1) {
+            stopDay = "0" + stopDay;
+        }
+
+        url = url + "&a=" + startDay + "&b=" + startMonth + "&c=" + startYear;
+        url = url + "&d=" + stopDay + "&e=" + stopMonth + "&f=" + stopYear + "&g=m&ignore=.csv";
+        url = java.net.URLEncoder.encode(url, "UTF-8");
+
+        return url;
+    }
+
+    public static void searchTK(String fileDir, String fileUrl) throws IOException {
+        //Code to download
+//        try {
+//            HttpDownloadUtility.downloadFile(fileUrl, fileDir);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//            return false;
+//        }
+//        return true;
+//        URL website = new URL(fileUrl);
+//        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+//        FileOutputStream fos = new FileOutputStream(fileDir);
+//        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        //System.out.println(fileUrl);
+        InputStream input = new URL("http://real-chart.finance.yahoo.com/table.csv?s=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv").openStream();
+        //Reader reader = new InputStreamReader(input, "UTF-8");
+
+    }
 }

@@ -54,7 +54,7 @@ public class ViewTicker extends javax.swing.JFrame {
 
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jButton1.setLabel("Scarica Ticker");
+        jButton1.setText("");
         jSplitPane2.setRightComponent(jButton1);
 
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
@@ -126,6 +126,9 @@ public class ViewTicker extends javax.swing.JFrame {
         myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());
         RowTicker rrt = myStmtDB.getAllFromDBData();
         System.out.println("Date from DB = " + rrt.getDateTk());
+        String myTKs = TickerController.makeURL("PHAU.MI");
+        TickerController.searchTK(TickerController.getDwlFullPath(),myTKs);
+        //System.out.println(dwload);
         /* Create and display the form */
         
         java.awt.EventQueue.invokeLater(new Runnable() {
