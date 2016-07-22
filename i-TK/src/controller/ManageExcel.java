@@ -8,9 +8,7 @@ package controller;
 
 
 import com.opencsv.CSVReader;
-import static controller.TickerController.getColumnFromIndex;
-import static controller.TickerController.string2DoubleArray;//NO
-import static controller.TickerController.string2DateArray;//NO
+
 import static controller.TickerController.getRowTickerArray;//??
 import controller.RowTicker;
 import java.io.BufferedReader;
