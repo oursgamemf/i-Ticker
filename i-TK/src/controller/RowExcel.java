@@ -21,6 +21,15 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 public class RowExcel {
     
+    
+    public static void setExcelHeader(Row myHeaderRow){
+        myHeaderRow.createCell(0).setCellValue("Date");
+        myHeaderRow.createCell(1).setCellValue("High");
+        myHeaderRow.createCell(2).setCellValue("Low");
+        myHeaderRow.createCell(3).setCellValue("Adj Close");
+    }
+    
+    
     public static void addRow2Excel(Workbook myWb, CreationHelper myCreateHelper, Row myRow, RowTicker myRowTk){
         
         Cell myCell = myRow.createCell(0);
