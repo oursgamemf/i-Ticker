@@ -11,8 +11,11 @@ import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.sql.Date;
@@ -20,6 +23,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -31,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import model.DBtkEvo;
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author emanuele
@@ -40,12 +45,16 @@ public class TickerController {
     private static final String URL_TEST_CONN = "https://www.google.it";
     private static final String PATH_TO_CONFIG = "i_tk.config";
     private static final String PATH_TO_CSV = "table.csv";
-    private static final String PATH_TO_DWL = "myDwlFile.html";
+    private static final String PATH_TO_DWL = "myDwlFile.csv";
+    private static final String PATH_TO_XLS = "renameME.xls";
+    private static final String URL_TO_SRC_DATA = "http://real-chart.finance.yahoo.com/table.csv?s";//=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
+    private static final String FULL_TEST_URL = "http://real-chart.finance.yahoo.com/table.csv?s=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
     private static final String opSys = System.getProperty("os.name");
     private static final Path curPath = Paths.get(System.getProperty("user.dir"));
     private static final String configFullPath = curPath.getParent().toString() + File.separator + PATH_TO_CONFIG;
     private static final String csvFullPath = curPath.getParent().toString() + File.separator + PATH_TO_CSV;
     private static final String dwlFullPath = curPath.getParent().toString() + File.separator + PATH_TO_DWL;
+    private static final String outExlFullPath = curPath.getParent().toString() + File.separator + PATH_TO_XLS;
 
     public static String getDwlFullPath() {
         return dwlFullPath;
@@ -59,7 +68,6 @@ public class TickerController {
         return csvFullPath;
     }
 
-         
     public static String getTicker(String tk) {
         // Remove space outside words
 
@@ -170,18 +178,14 @@ public class TickerController {
 
     public static String makeURL(String tk) {
         // Compose full URL
-
-        String url = "file://real-chart.finance.yahoo.com/table.csv?s=";
-        url = url + tk;
+        String url = URL_TO_SRC_DATA + tk;
         url = url + "&a=01&b=01&c=1900&d=12&e=12&f=2116&g=m&ignore=.csv";
-
         return url;
     }
 
     public static String makeURL(String tk, Date startDate, Date stopDate) throws UnsupportedEncodingException {
         // Compose full URL
-        String url = "file://real-chart.finance.yahoo.com/table.csv?s=";
-        url = url + tk;
+        String url = URL_TO_SRC_DATA + tk;
 
         Calendar startCal = Calendar.getInstance();
         startCal.setTime(startDate);
@@ -214,22 +218,22 @@ public class TickerController {
         return url;
     }
 
-    public static void searchTK(String fileDir, String fileUrl) throws IOException {
+    public static void searchTK(String fileDir, String fileUrl) {
         //Code to download
-//        try {
-//            HttpDownloadUtility.downloadFile(fileUrl, fileDir);
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//        URL website = new URL(fileUrl);
-//        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-//        FileOutputStream fos = new FileOutputStream(fileDir);
-//        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-        //System.out.println(fileUrl);
-        InputStream input = new URL("http://real-chart.finance.yahoo.com/table.csv?s=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv").openStream();
-        //Reader reader = new InputStreamReader(input, "UTF-8");
+        InputStream input;
+        File myFile = new File(fileDir);
+        
+        try {
+            URL myUrl = new URL(fileUrl); 
+            input = myUrl.openStream();
+            FileUtils.copyURLToFile(myUrl, myFile);
+            Reader reader = new InputStreamReader(input, "UTF-8");
+            
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 }
