@@ -126,12 +126,9 @@ public class ViewTicker extends javax.swing.JFrame {
         ArrayList<RowTicker> myTicker = getRowTickerArray(data);
         myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());
         RowTicker rrt = myStmtDB.getAllFromDBData();
-        System.out.println("Date from DB = " + rrt.getDateTk());
         String myTKs = TickerController.makeURL("PHAU.MI");
         TickerController.searchSaveTK(myTKs,"PHAU.MI");
-        //System.out.println(dwload);
-        /* Create and display the form */
-        
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ViewTicker().setVisible(true);
