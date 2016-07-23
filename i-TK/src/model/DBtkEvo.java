@@ -142,7 +142,6 @@ public class DBtkEvo {
         Connection conn = connectOrCreate();
         String dropTableDML = sDropTable + getsTable() + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
-            System.out.println(dropTableDML);
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
@@ -194,11 +193,8 @@ public class DBtkEvo {
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
             for (RowTicker rowTT : information) {              
                 pstmt.setDate(1, sysDate);
-                System.out.println(sysDate);
                 pstmt.setDate(2, rowTT.getDateTk());
-                System.out.println(rowTT.getDateTk());
                 pstmt.setDouble(3, rowTT.getOpenTk());
-                System.out.println(rowTT.getOpenTk());
                 pstmt.setDouble(4, rowTT.getHighTk());
                 pstmt.setDouble(5, rowTT.getLowTk());
                 pstmt.setDouble(6, rowTT.getCloseTk());
