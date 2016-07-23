@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import model.DBtkEvo;
 import org.apache.commons.io.FileUtils;
+import static controller.ManageExcel.getAllDataFromFile;
 
 /**
  * @author emanuele
@@ -47,7 +48,7 @@ public class TickerController {
     private static final String PATH_TO_CSV = "table.csv";
     private static final String PATH_TO_DWL = "myDwlFile.csv";
     private static final String PATH_TO_XLS = "renameME.xls";
-    private static final String URL_TO_SRC_DATA = "http://real-chart.finance.yahoo.com/table.csv?s";//=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
+    private static final String URL_TO_SRC_DATA = "http://real-chart.finance.yahoo.com/table.csv?s=";//=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
     private static final String FULL_TEST_URL = "http://real-chart.finance.yahoo.com/table.csv?s=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
     private static final String opSys = System.getProperty("os.name");
     private static final Path curPath = Paths.get(System.getProperty("user.dir"));
@@ -218,10 +219,12 @@ public class TickerController {
         return url;
     }
 
-    public static void searchTK(String fileDir, String fileUrl) {
+    public static void searchSaveTK(String fileUrl,String nameTK ) {
         //Code to download
         InputStream input;
-        File myFile = new File(fileDir);
+        String pathNameDwlCSV = curPath.getParent().toString() + File.separator + nameTK + ".csv";
+        System.out.println(pathNameDwlCSV);
+        File myFile = new File(pathNameDwlCSV);
         
         try {
             URL myUrl = new URL(fileUrl); 
