@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import model.DBtkEvo;
+import static controller.ManageExcel.getAllDataFromFile;
 
 /**
  *
@@ -127,7 +128,7 @@ public class ViewTicker extends javax.swing.JFrame {
         RowTicker rrt = myStmtDB.getAllFromDBData();
         System.out.println("Date from DB = " + rrt.getDateTk());
         String myTKs = TickerController.makeURL("PHAU.MI");
-        TickerController.searchTK(TickerController.getDwlFullPath(),myTKs);
+        TickerController.searchSaveTK(myTKs,"PHAU.MI");
         //System.out.println(dwload);
         /* Create and display the form */
         
