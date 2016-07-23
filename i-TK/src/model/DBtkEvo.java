@@ -138,13 +138,41 @@ public class DBtkEvo {
         return false;
     }
     
+    public boolean createTable(String table, String fieldOfTheTable) {
+        if ((table == null) || (fieldOfTheTable == null)) {
+            System.out.println("nullVAlue");
+            return false;
+        }
+        Connection conn = connectOrCreate();
+        String createTableDML = sMakeTable+ table + " (" +fieldOfTheTable+ ");";
+        try (PreparedStatement pstmt = conn.prepareStatement(createTableDML);) {
+            pstmt.executeUpdate();
+            
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
     public void dropTable(){
         Connection conn = connectOrCreate();
         String dropTableDML = sDropTable + getsTable() + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(" Table " +  getsTable() + "not exist");
+        }
+        
+    }
+    
+    public void dropTable(String tableToBeDrop){
+        Connection conn = connectOrCreate();
+        String dropTableDML = sDropTable + tableToBeDrop + ";";
+        try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(" Table " +  getsTable() + " not exist");
         }
         
     }
@@ -176,7 +204,13 @@ public class DBtkEvo {
         try (Statement stmt = conn.createStatement();) {
             ResultSet rs = stmt.executeQuery(pstmtSelect);
             while (rs.next()) {
-                rtFromDB.setDateTk(rs.getDate("dateTk"));           
+                rtFromDB.setAdjCloseTk(rs.getDouble("adjTk"));
+                rtFromDB.setCloseTk(rs.getDouble("closeTk"));
+                rtFromDB.setHighTk(rs.getDouble("highTk"));
+                rtFromDB.setLowTk(rs.getDouble("lowtk"));
+                rtFromDB.setOpenTk(rs.getDouble("openTk"));
+                rtFromDB.setDateTk(rs.getDate("dateTk"));
+                rtFromDB.setVolumeTk(rs.getDouble("volumeTk"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
@@ -199,6 +233,7 @@ public class DBtkEvo {
                 pstmt.setDouble(5, rowTT.getLowTk());
                 pstmt.setDouble(6, rowTT.getCloseTk());
                 pstmt.setDouble(7, rowTT.getVolumeTk());
+                pstmt.setDouble(8, rowTT.getAdjCloseTk());
                 pstmt.execute();
             }
 
@@ -209,7 +244,31 @@ public class DBtkEvo {
         return createSuccessful;
     }
     
- 
+ public boolean insertRowTKinDB(ArrayList<RowTicker> information, String query, String targetTable) {
+        Connection conn = connectOrCreate();
+        boolean createSuccessful = false;
+        String pstmtUpdate = INSERT + targetTable + query + ";";
+        try (PreparedStatement pstmt = conn.prepareStatement(pstmtUpdate);) {
+            Date a = new Date(iTimeout);
+            java.sql.Date sysDate = new java.sql.Date(a.getTime());
+            for (RowTicker rowTT : information) {              
+                pstmt.setDate(1, sysDate);
+                pstmt.setDate(2, rowTT.getDateTk());
+                pstmt.setDouble(3, rowTT.getOpenTk());
+                pstmt.setDouble(4, rowTT.getHighTk());
+                pstmt.setDouble(5, rowTT.getLowTk());
+                pstmt.setDouble(6, rowTT.getCloseTk());
+                pstmt.setDouble(7, rowTT.getVolumeTk());
+                pstmt.setDouble(8, rowTT.getAdjCloseTk());
+                pstmt.execute();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return createSuccessful;
+    }
     
 
 }

@@ -128,7 +128,7 @@ public class ViewTicker extends javax.swing.JFrame {
         TickerController.searchSaveTK(myTKs,testTKSearch);
         ArrayList<ArrayList<String>> data = getAllDataFromTKFile(testTKSearch,',');
         ArrayList<RowTicker> myTicker = getRowTickerArray(data);
-        myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());
+        myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());// Use default query -NEED override this method!!
         RowTicker rrt = myStmtDB.getAllFromDBData();
         
 

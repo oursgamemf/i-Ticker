@@ -121,9 +121,14 @@ public class TickerController {
         sessionDB.setQuery(configData.get(3).get(1));
 
         sessionDB.connectOrCreate();
-        sessionDB.dropTable();
+        sessionDB.dropTable(); // Remove it!!!
         sessionDB.createTable();
-
+        
+        // Second table
+        sessionDB.setsFieldTableCreate(configData.get(4).get(1));
+        sessionDB.dropTable(configData.get(4).get(1)); // Remove it!!!
+        Boolean testSecDB = sessionDB.createTable(configData.get(4).get(1), configData.get(5).get(1));
+        
         return sessionDB;
     }
 
