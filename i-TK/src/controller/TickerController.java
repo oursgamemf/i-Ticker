@@ -223,7 +223,6 @@ public class TickerController {
         //Code to download
         InputStream input;
         String pathNameDwlCSV = curPath.getParent().toString() + File.separator + nameTK + ".csv";
-        System.out.println(pathNameDwlCSV);
         File myFile = new File(pathNameDwlCSV);
         
         try {
