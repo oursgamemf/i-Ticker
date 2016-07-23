@@ -134,6 +134,32 @@ public class ManageExcel {
         return allData;
     }
     
+     public static ArrayList<ArrayList<String>> getAllDataFromTKFile( String csvInputName, char sep) {
+        String csvInputPath = TickerController.getInsideFullPath() + csvInputName + ".csv";
+        // Get datas from csv file to ArrayList of ArrayList
+        ArrayList<ArrayList<String>> allData = new ArrayList<>();
+        try (CSVReader reader = new CSVReader(new FileReader(csvInputPath), sep);) {
+            String[] nextLine;
+            int numRow = 0;
+            while ((nextLine = reader.readNext()) != null && numRow < 8000) {
+                ArrayList<String> allRow = new ArrayList<String>();
+                for (String cell : nextLine) {
+                    allRow.add(cell);
+                }
+                allData.add(allRow);
+                numRow += 1;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManageExcel.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+        } catch (IOException ex) {
+            Logger.getLogger(ManageExcel.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+        return allData;
+    }
+     
     public static ArrayList<String> getHeaderList(ArrayList<ArrayList<String>> allData){
         // Return an array storing each header (column name) of "allData"
         

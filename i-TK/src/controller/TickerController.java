@@ -43,6 +43,10 @@ import static controller.ManageExcel.getAllDataFromFile;
  */
 public class TickerController {
 
+    public static String getInsideFullPath() {
+        return insideFullPath;
+    }
+
     private static final String URL_TEST_CONN = "https://www.google.it";
     private static final String PATH_TO_CONFIG = "i_tk.config";
     private static final String PATH_TO_CSV = "table.csv";
@@ -52,10 +56,11 @@ public class TickerController {
     private static final String FULL_TEST_URL = "http://real-chart.finance.yahoo.com/table.csv?s=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
     private static final String opSys = System.getProperty("os.name");
     private static final Path curPath = Paths.get(System.getProperty("user.dir"));
-    private static final String configFullPath = curPath.getParent().toString() + File.separator + PATH_TO_CONFIG;
-    private static final String csvFullPath = curPath.getParent().toString() + File.separator + PATH_TO_CSV;
-    private static final String dwlFullPath = curPath.getParent().toString() + File.separator + PATH_TO_DWL;
-    private static final String outExlFullPath = curPath.getParent().toString() + File.separator + PATH_TO_XLS;
+    private static final String insideFullPath = curPath.getParent().toString() + File.separator;
+    private static final String configFullPath = insideFullPath + PATH_TO_CONFIG;
+    private static final String csvFullPath = insideFullPath + PATH_TO_CSV;
+    private static final String dwlFullPath = insideFullPath + PATH_TO_DWL;
+    private static final String outExlFullPath = insideFullPath + PATH_TO_XLS;
 
     public static String getDwlFullPath() {
         return dwlFullPath;

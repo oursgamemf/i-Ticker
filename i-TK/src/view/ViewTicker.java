@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import model.DBtkEvo;
 import static controller.ManageExcel.getAllDataFromFile;
+import static controller.ManageExcel.getAllDataFromTKFile;
 
 /**
  *
@@ -121,13 +122,15 @@ public class ViewTicker extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ViewTicker.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        DBtkEvo myStmtDB = runMeAtStart(); 
-        ArrayList<ArrayList<String>> data = getAllDataFromFile(TickerController.getCsvFullPath(),',');
+        DBtkEvo myStmtDB = runMeAtStart();
+        String testTKSearch = "PHAU.MI";
+        String myTKs = TickerController.makeURL(testTKSearch);
+        TickerController.searchSaveTK(myTKs,testTKSearch);
+        ArrayList<ArrayList<String>> data = getAllDataFromTKFile(testTKSearch,',');
         ArrayList<RowTicker> myTicker = getRowTickerArray(data);
         myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());
         RowTicker rrt = myStmtDB.getAllFromDBData();
-        String myTKs = TickerController.makeURL("PHAU.MI");
-        TickerController.searchSaveTK(myTKs,"PHAU.MI");
+        
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
