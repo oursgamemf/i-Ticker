@@ -5,6 +5,7 @@
  */
 package view;
 
+import controller.ManageExcel;
 import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
@@ -28,6 +29,8 @@ import java.io.FileWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import static controller.ManageExcel.getAllDataFromFile;
+import static controller.ManageExcel.getAllDataFromFile;
 
 /**
  *
@@ -36,7 +39,7 @@ import javax.swing.JFileChooser;
 public class ViewTicker extends javax.swing.JFrame {
 
     public static TickerController tkC = new TickerController();
-
+    public static String outputExcelFile  = "none";
     /**
      * Creates new form ViewTicker
      */
@@ -48,23 +51,25 @@ public class ViewTicker extends javax.swing.JFrame {
         for (int ii = 1; ii < runMeAtStart().size(); ii++) {
             setList.add((String) subSetList.get(ii));
         } // From here setList has all config data
-        
+        outputExcelFile = setList.get(8);
         //RowTicker rrt = myStmtDB.getAllFromDBData(); // get data from DB
-        
-        
         
         // Initialize the UI
         initComponents();
         
         // Enable or disable the search Button
-        String pathTKsaved = setList.get(8);
-        buttonEnabling(pathTKsaved);
+        // String pathTKsaved = setList.get(8);
+        //buttonEnabling(pathTKsaved);
+        buttonEnabling();
         
     }
+    
+                                     
 
+     
     public void write2configFile(String selectedPath) throws FileNotFoundException, IOException{
-        File inputFile = new File("i_tk_prova.config");
-        File tempFile = new File("myTempFile.config");
+        File inputFile = new File(TickerController.getConfigFullPath());
+        File tempFile = new File(TickerController.getConfigTempFullPath());
 
         BufferedReader reader = new BufferedReader(new FileReader(inputFile));
         BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
@@ -99,105 +104,114 @@ public class ViewTicker extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
-        jButton1 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
+        jSplitPane3 = new javax.swing.JSplitPane();
         jSplitPane4 = new javax.swing.JSplitPane();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        jSplitPane2.setRightComponent(jButton1);
-
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        jTextField1.setText("e.g.GBS.MI");
-
-        jButton4.setText("Sel Cartella Dest");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        jButton1.setText("Sel. Cartella Destinazione");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
-        jSplitPane4.setLeftComponent(jButton4);
+        jSplitPane4.setLeftComponent(jButton1);
 
-        jButton5.setText("Avvia Scaricamento");
-        jButton5.setToolTipText("");
-        jSplitPane4.setRightComponent(jButton5);
+        jButton2.setText("Avvia Scaricamento");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jSplitPane4.setRightComponent(jButton2);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSplitPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+        jSplitPane3.setRightComponent(jSplitPane4);
 
-        jSplitPane2.setLeftComponent(jPanel1);
+        jTextField1.setText("e.g.PHAU.MI");
+        jSplitPane3.setLeftComponent(jTextField1);
 
-        jSplitPane1.setTopComponent(jSplitPane2);
-        jSplitPane1.setRightComponent(jScrollPane2);
-
-        jScrollPane1.setViewportView(jSplitPane1);
+        jSplitPane2.setTopComponent(jSplitPane3);
+        jSplitPane2.setRightComponent(jScrollPane3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-   
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+          // TODO add your handling code here:
         //Create a file chooser
         final JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         //In response to a button click:
-        int result = fc.showOpenDialog(jButton4);
-        
+        int result = fc.showOpenDialog(jButton1);
+       
         if (result == JFileChooser.APPROVE_OPTION) {
                 String selectedPath = fc.getSelectedFile().getAbsolutePath();
             System.out.println("Open was selected: " + selectedPath);
             try {
                 write2configFile(selectedPath);
+                outputExcelFile  = selectedPath;
+
             } catch (IOException ex) {
                 Logger.getLogger(ViewTicker.class.getName()).log(Level.SEVERE, null, ex);
             }
-            jButton5.setEnabled(true);
+            jButton2.setEnabled(true);
         } else if (result == JFileChooser.CANCEL_OPTION) {
             String selectedPath = fc.getCurrentDirectory().getAbsolutePath();
             System.out.println("Cancel was selected: " + "none");
         }
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        String tickerName = jTextField1.getText();
+        Boolean isWebConn = TickerController.getWebConnection();
+        if(isWebConn){
+            String myTKs = TickerController.makeURL(tickerName);
+            TickerController.searchSaveTK(myTKs, tickerName);
+            ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tickerName, ',');
+            ArrayList<RowTicker> myTicker = getRowTickerArray(data);
+            ManageExcel.createExcel(myTicker,outputExcelFile, tickerName);
+            
+        }
+        else {
+            System.out.println("Controllare la connessione ad internet");
+        }
+        
+        
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
+    
+    private void buttonEnabling(){
+        if (outputExcelFile.equals("none")){
+            jButton2.setEnabled(false);
+        }else{
+            jButton2.setEnabled(true);
+        }
+    }
+    
     private void buttonEnabling(String pathConfigFile){
         if (pathConfigFile.equals("none")){
-            jButton5.setEnabled(false);
+            jButton2.setEnabled(false);
         }else{
-            jButton5.setEnabled(true);
+            jButton2.setEnabled(true);
         }
     }
     
@@ -253,13 +267,10 @@ public class ViewTicker extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JSplitPane jSplitPane4;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables

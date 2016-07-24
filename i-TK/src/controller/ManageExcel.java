@@ -8,12 +8,14 @@ package controller;
 
 
 import com.opencsv.CSVReader;
+import static controller.RowExcel.addSheet2Excel;
 
 import static controller.TickerController.getRowTickerArray;//??
 import controller.RowTicker;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,6 +27,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Workbook;
 
 /*
  * @author emanuele.calabro
@@ -214,6 +219,30 @@ public class ManageExcel {
         }
     }
     
+       public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName){
+        Workbook myWb = new HSSFWorkbook();          //Workbook wb = new XSSFWorkbook();
+        CreationHelper myCreateHelper = myWb.getCreationHelper();
+      
+        String mySheetName = "Mensile";
+        addSheet2Excel(myWb, myCreateHelper, mySheetName, myTicker);
+
+        // Write the output to a file
+        String outputFilePath = userSavePath + File.separator +fileName + ".xls";
+        FileOutputStream fileOut;
+        try {
+            fileOut = new FileOutputStream(outputFilePath);
+            myWb.write(fileOut);
+            fileOut.close();
+        } catch (FileNotFoundException ex) {
+            //Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unable to write the file");
+        } catch (IOException ex) {
+            //Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unable to write the file I/O Ex");
+        }
+        
+        
+       }
     /**
      * @param args the command line arguments
      */

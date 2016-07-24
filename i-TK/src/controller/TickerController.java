@@ -49,6 +49,7 @@ public class TickerController {
 
     private static final String URL_TEST_CONN = "https://www.google.it";
     private static final String PATH_TO_CONFIG = "i_tk.config";
+    private static final String PATH_TO_TEMP_CONFIG = "myTempFile.config";
     private static final String PATH_TO_CSV = "table.csv";
     private static final String PATH_TO_DWL = "myDwlFile.csv";
     private static final String PATH_TO_XLS = "renameME.xls";
@@ -58,6 +59,11 @@ public class TickerController {
     private static final Path curPath = Paths.get(System.getProperty("user.dir"));
     private static final String insideFullPath = curPath.getParent().toString() + File.separator;
     private static final String configFullPath = insideFullPath + PATH_TO_CONFIG;
+    private static final String configTempFullPath = insideFullPath + PATH_TO_TEMP_CONFIG;
+
+    public static String getConfigTempFullPath() {
+        return configTempFullPath;
+    }
     private static final String csvFullPath = insideFullPath + PATH_TO_CSV;
     private static final String dwlFullPath = insideFullPath + PATH_TO_DWL;
     private static final String outExlFullPath = insideFullPath + PATH_TO_XLS;
@@ -82,7 +88,7 @@ public class TickerController {
 
     }
 
-    public boolean getWebConnection() {
+    public static boolean getWebConnection() {
         try {
             //make a URL to a known source
             URL url = new URL("http://www.google.com");
