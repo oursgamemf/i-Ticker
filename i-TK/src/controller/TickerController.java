@@ -110,9 +110,10 @@ public class TickerController {
     }
 
     // ManageFile
-    public static DBtkEvo runMeAtStart() {
+    public static ArrayList<Object> runMeAtStart() {
         //Linux
         //.getParent()
+        ArrayList<Object> loadSet = new ArrayList<>();
         ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath, ';');
         DBtkEvo sessionDB = new DBtkEvo();
         sessionDB.setsDBname(configData.get(0).get(1));
@@ -129,7 +130,17 @@ public class TickerController {
         sessionDB.dropTable(configData.get(4).get(1)); // Remove it!!!
         Boolean testSecDB = sessionDB.createTable(configData.get(4).get(1), configData.get(5).get(1));
         
-        return sessionDB;
+        loadSet.add(sessionDB);
+        loadSet.add(configData.get(0).get(1));
+        loadSet.add(configData.get(1).get(1));
+        loadSet.add(configData.get(2).get(1));
+        loadSet.add(configData.get(3).get(1));
+        loadSet.add(configData.get(4).get(1));
+        loadSet.add(configData.get(5).get(1));
+        loadSet.add(configData.get(6).get(1));
+        loadSet.add(configData.get(7).get(1));
+        loadSet.add(configData.get(8).get(1));
+        return loadSet;
     }
 
     public static ArrayList<RowTicker> getRowTickerArray(ArrayList<ArrayList<String>> datas) {
