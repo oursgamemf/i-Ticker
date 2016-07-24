@@ -109,6 +109,7 @@ public class ManageExcel {
         return allData;
     }
     
+    
     public static ArrayList<ArrayList<String>> getAllDataFromFile( String csvInputPath, char sep) {
         // Get datas from csv file to ArrayList of ArrayList
         ArrayList<ArrayList<String>> allData = new ArrayList<>();

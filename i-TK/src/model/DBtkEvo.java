@@ -3,6 +3,7 @@ package model;
 /**
  * @author emanuele
  */
+import controller.RowChoosenTks;
 import controller.RowTicker;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -35,6 +36,22 @@ public class DBtkEvo {
     private static String query = null;
     private static final String INSERT = "INSERT INTO ";
     private static final String SELECT_ALL = "SELECT * FROM ";
+    private static String ALREADY_IN_DB = "SELECT tk_name FROM ? WHERE tk_name = '?' ";
+
+    public Boolean checkIfAlreadyIn(String tableName, String tkName) {
+        Connection conn = connectOrCreate();
+        String ifExist = "SELECT tk_name FROM " + tableName + " WHERE tk_name = '" + tkName.trim() + "';";
+        try (Statement stmt = conn.createStatement();) {
+            ResultSet rs = stmt.executeQuery(ifExist);
+            while (rs.next()) {
+                return true;
+            }
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
 
     public String getQuery() {
         return query;
@@ -59,12 +76,13 @@ public class DBtkEvo {
         if (sDBname == null) {
             return null;
         }
-        if(!driverConn())
+        if (!driverConn()) {
             System.out.println("No DB driver found");
+        }
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(sDbUrl + getsDBname() + DB_EXTENSION );
-            
+            conn = DriverManager.getConnection(sDbUrl + getsDBname() + DB_EXTENSION);
+
             return conn;
         } catch (SQLException ex) {
             System.out.println("No DB driver found");
@@ -127,56 +145,56 @@ public class DBtkEvo {
             return false;
         }
         Connection conn = connectOrCreate();
-        String createTableDML = sMakeTable+ getsTable() + " (" +getsFieldTableCreate()+ ");";
+        String createTableDML = sMakeTable + getsTable() + " (" + getsFieldTableCreate() + ");";
         try (PreparedStatement pstmt = conn.prepareStatement(createTableDML);) {
             pstmt.executeUpdate();
-            
+
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
-    
+
     public boolean createTable(String table, String fieldOfTheTable) {
         if ((table == null) || (fieldOfTheTable == null)) {
             System.out.println("nullVAlue");
             return false;
         }
         Connection conn = connectOrCreate();
-        String createTableDML = sMakeTable+ table + " (" +fieldOfTheTable+ ");";
+        String createTableDML = sMakeTable + table + " (" + fieldOfTheTable + ");";
         try (PreparedStatement pstmt = conn.prepareStatement(createTableDML);) {
             pstmt.executeUpdate();
-            
+
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
-    
-    public void dropTable(){
+
+    public void dropTable() {
         Connection conn = connectOrCreate();
         String dropTableDML = sDropTable + getsTable() + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-            System.out.println(" Table " +  getsTable() + "not exist");
+            System.out.println(" Table " + getsTable() + "not exist");
         }
-        
+
     }
-    
-    public void dropTable(String tableToBeDrop){
+
+    public void dropTable(String tableToBeDrop) {
         Connection conn = connectOrCreate();
         String dropTableDML = sDropTable + tableToBeDrop + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-            System.out.println(" Table " +  getsTable() + " not exist");
+            System.out.println(" Table " + getsTable() + " not exist");
         }
-        
+
     }
-    
+
     public int fillTable(String DB, String nameTable, String insertColName, String insertValue[]) {
         setsTable(nameTable);
         setsInsertWhere(insertColName);
@@ -196,8 +214,8 @@ public class DBtkEvo {
         return numInsRow; // nows inserted
 
     }
-    
-    public RowTicker getAllFromDBData(){
+
+    public RowTicker getAllFromDBData() {
         RowTicker rtFromDB = new RowTicker();
         Connection conn = connectOrCreate();
         String pstmtSelect = SELECT_ALL + getsTable() + ";";
@@ -217,15 +235,35 @@ public class DBtkEvo {
         }
         return rtFromDB;
     }
-    
+
+    public ArrayList<RowChoosenTks> getAllRowChoosenDBData(String tableName) {
+        ArrayList<RowChoosenTks> outputData = new ArrayList<>();
+        RowChoosenTks rtFromDB = new RowChoosenTks();
+        Connection conn = connectOrCreate();
+        String pstmtSelect = SELECT_ALL + tableName + ";";
+        try (Statement stmt = conn.createStatement();) {
+            ResultSet rs = stmt.executeQuery(pstmtSelect);
+            while (rs.next()) {
+                rtFromDB.setTickerName(rs.getString("tk_name"));
+                rtFromDB.setLastDownloadDate(rs.getDate("date_last_dwl"));
+                rtFromDB.setAutomaticRefresh(rs.getBoolean("self_dwl"));
+                rtFromDB.setRefreshPeriod(rs.getInt("NEXT_DWL"));
+                outputData.add(rtFromDB);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return outputData;
+    }
+
     public boolean insertRowTKinDB(ArrayList<RowTicker> information, String query) {
         Connection conn = connectOrCreate();
         boolean createSuccessful = false;
         String pstmtUpdate = INSERT + getsTable() + query + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(pstmtUpdate);) {
-            Date a = new Date(iTimeout);
+            Date a = new Date(Calendar.getInstance().getTime().getTime());
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
-            for (RowTicker rowTT : information) {              
+            for (RowTicker rowTT : information) {
                 pstmt.setDate(1, sysDate);
                 pstmt.setDate(2, rowTT.getDateTk());
                 pstmt.setDouble(3, rowTT.getOpenTk());
@@ -243,23 +281,20 @@ public class DBtkEvo {
 
         return createSuccessful;
     }
-    
- public boolean insertRowTKinDB(ArrayList<RowTicker> information, String query, String targetTable) {
+
+    public boolean insRowChoosenTKinDB(ArrayList<RowChoosenTks> information, String query, String targetTable) {
         Connection conn = connectOrCreate();
         boolean createSuccessful = false;
-        String pstmtUpdate = INSERT + targetTable + query + ";";
+        String pstmtUpdate = INSERT + targetTable + " " + query + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(pstmtUpdate);) {
             Date a = new Date(iTimeout);
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
-            for (RowTicker rowTT : information) {              
-                pstmt.setDate(1, sysDate);
-                pstmt.setDate(2, rowTT.getDateTk());
-                pstmt.setDouble(3, rowTT.getOpenTk());
-                pstmt.setDouble(4, rowTT.getHighTk());
-                pstmt.setDouble(5, rowTT.getLowTk());
-                pstmt.setDouble(6, rowTT.getCloseTk());
-                pstmt.setDouble(7, rowTT.getVolumeTk());
-                pstmt.setDouble(8, rowTT.getAdjCloseTk());
+            for (RowChoosenTks rowTT : information) {
+                // date_last_dwl,self_dwl ,NEXT_DWL
+                pstmt.setString(1, rowTT.getTickerName());
+                pstmt.setDate(2, rowTT.getLastDownloadDate());
+                pstmt.setBoolean(3, rowTT.getAutomaticRefresh());
+                pstmt.setInt(4, rowTT.getRefreshPeriod());
                 pstmt.execute();
             }
 
@@ -269,6 +304,5 @@ public class DBtkEvo {
 
         return createSuccessful;
     }
-    
 
 }

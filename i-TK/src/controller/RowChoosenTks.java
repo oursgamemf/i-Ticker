@@ -18,35 +18,35 @@ public class RowChoosenTks {
     private Boolean automaticRefresh;
     private int refreshPeriod;
 
-    public Date getDateTk() {
+    public Date getLastDownloadDate() {
         return lastDownloadDate;
     }
 
     public void setLastDownloadDate(Date dateTk) {
-        this.lastDownloadDate = lastDownloadDate;
+        this.lastDownloadDate = dateTk;
     }
 
     public Boolean getAutomaticRefresh() {
         return automaticRefresh;
     }
 
-    public void setAutomaticRefresh(Double openTk) {
-        this.automaticRefresh = automaticRefresh;
+    public void setAutomaticRefresh(Boolean openTk) {
+        this.automaticRefresh = openTk;
     }
 
     public int getRefreshPeriod() {
         return refreshPeriod;
     }
 
-    public void setRefreshPeriod(Double highTk) {
-        this.refreshPeriod = refreshPeriod;
+    public void setRefreshPeriod(int highTk) {
+        this.refreshPeriod = highTk;
     }
 
     public String getTickerName() {
         return tickerName;
     }
 
-    public void setTickerName(Double lowTk) {
+    public void setTickerName(String lowTk) {
         this.tickerName = tickerName;
     }
    

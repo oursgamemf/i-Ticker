@@ -113,7 +113,7 @@ public class TickerController {
     public static ArrayList<Object> runMeAtStart() {
         //Linux
         //.getParent()
-        ArrayList<Object> loadSet = new ArrayList<>();
+        ArrayList<Object> loadSet = new ArrayList<Object>();
         ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath, ';');
         DBtkEvo sessionDB = new DBtkEvo();
         sessionDB.setsDBname(configData.get(0).get(1));
@@ -239,11 +239,25 @@ public class TickerController {
 
         return url;
     }
-
+    
+    public RowChoosenTks addTkChoosenInOBJ(DBtkEvo usingDB,String table,String ticker){
+        Boolean isAlreadyIn = usingDB.checkIfAlreadyIn(table,ticker);
+        RowChoosenTks rct = new RowChoosenTks();
+        if (!isAlreadyIn){
+            Date a = new Date(Calendar.getInstance().getTime().getTime());
+            java.sql.Date sysDate = new java.sql.Date(a.getTime());          
+            rct.setTickerName(ticker.trim());
+            rct.setAutomaticRefresh(false);
+            rct.setLastDownloadDate(sysDate);
+            rct.setRefreshPeriod(10);
+        }
+        return rct;
+    }
+    
     public static void searchSaveTK(String fileUrl,String nameTK ) {
         //Code to download
         InputStream input;
-        String pathNameDwlCSV = curPath.getParent().toString() + File.separator + nameTK + ".csv";
+        String pathNameDwlCSV = curPath.getParent().toString() + File.separator + nameTK.trim() + ".csv";
         File myFile = new File(pathNameDwlCSV);
         
         try {
@@ -253,7 +267,8 @@ public class TickerController {
             Reader reader = new InputStreamReader(input, "UTF-8");
             
         } catch (MalformedURLException ex) {
-            Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+            // Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unable to find this Ticker, correct it please.");
         } catch (IOException ex) {
             Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
         }
