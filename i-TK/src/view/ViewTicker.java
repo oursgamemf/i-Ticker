@@ -47,16 +47,19 @@ public class ViewTicker extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
+        jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
-        jSplitPane3 = new javax.swing.JSplitPane();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jSplitPane4 = new javax.swing.JSplitPane();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jSplitPane2.setRightComponent(jButton1);
 
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         jTextField1.setText("e.g.GBS.MI");
@@ -76,13 +79,19 @@ public class ViewTicker extends javax.swing.JFrame {
 
         jSplitPane2.setLeftComponent(jPanel1);
 
-        jButton2.setText("jButton2");
-        jSplitPane3.setLeftComponent(jButton2);
+        jButton4.setText("Sel Cartella Dest");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jSplitPane4.setLeftComponent(jButton4);
 
-        jButton3.setText("jButton3");
-        jSplitPane3.setRightComponent(jButton3);
+        jButton5.setText("Avvia Scaricamento");
+        jButton5.setToolTipText("");
+        jSplitPane4.setRightComponent(jButton5);
 
-        jSplitPane2.setRightComponent(jSplitPane3);
+        jSplitPane2.setRightComponent(jSplitPane4);
 
         jSplitPane1.setTopComponent(jSplitPane2);
         jSplitPane1.setRightComponent(jScrollPane2);
@@ -102,6 +111,10 @@ public class ViewTicker extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -143,6 +156,7 @@ public class ViewTicker extends javax.swing.JFrame {
         ArrayList<RowTicker> myTicker = getRowTickerArray(data);
         myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());// Use default query -NEED override this method!!
         RowTicker rrt = myStmtDB.getAllFromDBData();
+        String pathTKsaved = setList.get(7);
         
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -154,14 +168,15 @@ public class ViewTicker extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
-    private javax.swing.JSplitPane jSplitPane3;
+    private javax.swing.JSplitPane jSplitPane4;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
