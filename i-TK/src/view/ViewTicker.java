@@ -241,6 +241,8 @@ public class ViewTicker extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ViewTicker.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+//        System.out.println("My relative Path:");
+//        System.out.println(new File(".").getCanonicalPath());
 
         //DBtkEvo myStmtDB = (DBtkEvo) runMeAtStart().get(0);
         //ArrayList<String> setList = new ArrayList<>();
