@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package controller;
+package controller; 
 
 import java.util.ArrayList;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -52,6 +52,7 @@ public class RowExcel {
             addRow2Excel(myWb, myCrHelper, myRow, myRowTk);
             lastRow = lastRow + 1;
         }
+        mySheet.autoSizeColumn(0, false);
     }
     
 }
