@@ -5,9 +5,10 @@
  */
 package controller;
 
+import java.util.ArrayList;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.sl.usermodel.MasterSheet;
-import org.apache.poi.sl.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.*;
 import org.apache.poi.ss.usermodel.Cell;
@@ -31,7 +32,6 @@ public class RowExcel {
     
     
     public static void addRow2Excel(Workbook myWb, CreationHelper myCreateHelper, Row myRow, RowTicker myRowTk){
-        
         Cell myCell = myRow.createCell(0);
         CellStyle cellStyle = myWb.createCellStyle();
         cellStyle.setDataFormat( myCreateHelper.createDataFormat().getFormat("yyyy-MM-dd"));
@@ -40,8 +40,18 @@ public class RowExcel {
         myRow.createCell(1).setCellValue(myRowTk.getHighTk());
         myRow.createCell(2).setCellValue(myRowTk.getLowTk());
         myRow.createCell(3).setCellValue(myRowTk.getAdjCloseTk());
-        
     }
     
+    public static void addSheet2Excel(Workbook myWb, CreationHelper myCrHelper, String sheetName, ArrayList<RowTicker> myTicker){
+        Sheet mySheet = myWb.createSheet(sheetName);
+        Row myHeaderRow = mySheet.createRow(0);
+        setExcelHeader(myHeaderRow);
+        int lastRow = 1;
+        for(RowTicker myRowTk: myTicker){
+            Row myRow = mySheet.createRow(lastRow);
+            addRow2Excel(myWb, myCrHelper, myRow, myRowTk);
+            lastRow = lastRow + 1;
+        }
+    }
     
 }
