@@ -5,8 +5,6 @@
  */
 package controller;
 
-
-
 import com.opencsv.CSVReader;
 import static controller.RowExcel.addSheet2Excel;
 
@@ -30,6 +28,10 @@ import java.util.logging.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /*
  * @author emanuele.calabro
@@ -45,11 +47,10 @@ public class ManageExcel {
     public void read() throws IOException {
 
     }
-    
-   
+
     public static int getColNumFromTxt(String headerName, ArrayList<ArrayList<String>> datas) {
         //Return the index of the column whose header name is "headerName"
-        
+
         int i = 0;
         for (i = 0; i < datas.get(0).size(); i++) {
             //System.out.println(datas.get(0).get(i));
@@ -62,7 +63,7 @@ public class ManageExcel {
 
     public static HashSet<String> getListOfValue(int colSel, ArrayList<ArrayList<String>> datas) {
         // Return all values of a column (colSel) without repetitions
-        
+
         HashSet<String> typeOf = new HashSet<String>();
         for (int i = 1; datas.get(i).get(colSel) != null; i++) {
             //System.out.println(datas.get(i).get(colSel));
@@ -77,18 +78,18 @@ public class ManageExcel {
         }
         return typeOf;
     }
-    
-    public static int getRowsData(ArrayList<ArrayList<String>> datas){
+
+    public static int getRowsData(ArrayList<ArrayList<String>> datas) {
         // Get number of rows in "datas" (header included)
-        
+
         int i = 0;
         int retVal = 0;
-        while ((datas.get(i).get(0) != null) && (datas.get(i).get(0) != "")){
+        while ((datas.get(i).get(0) != null) && (datas.get(i).get(0) != "")) {
             retVal += 1;
         }
         return retVal;
     }
-    
+
     public static ArrayList<ArrayList<String>> getAllDataFromFile(char sep) {
         ArrayList<ArrayList<String>> allData = new ArrayList<>();
         // Get datas from csv file to ArrayList of ArrayList
@@ -113,9 +114,8 @@ public class ManageExcel {
         }
         return allData;
     }
-    
-    
-    public static ArrayList<ArrayList<String>> getAllDataFromFile( String csvInputPath, char sep) {
+
+    public static ArrayList<ArrayList<String>> getAllDataFromFile(String csvInputPath, char sep) {
         // Get datas from csv file to ArrayList of ArrayList
         ArrayList<ArrayList<String>> allData = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new FileReader(csvInputPath), sep);) {
@@ -139,8 +139,8 @@ public class ManageExcel {
         }
         return allData;
     }
-    
-     public static ArrayList<ArrayList<String>> getAllDataFromTKFile( String csvInputName, char sep) {
+
+    public static ArrayList<ArrayList<String>> getAllDataFromTKFile(String csvInputName, char sep) {
         String csvInputPath = TickerController.getInsideFullPath() + csvInputName + ".csv";
         // Get datas from csv file to ArrayList of ArrayList
         ArrayList<ArrayList<String>> allData = new ArrayList<>();
@@ -165,49 +165,47 @@ public class ManageExcel {
         }
         return allData;
     }
-     
-    public static ArrayList<String> getHeaderList(ArrayList<ArrayList<String>> allData){
+
+    public static ArrayList<String> getHeaderList(ArrayList<ArrayList<String>> allData) {
         // Return an array storing each header (column name) of "allData"
-        
+
         ArrayList<String> myHeader = new ArrayList<>();
         for (int i = 0; i < allData.get(0).size(); i++) {
-            if ((allData.get(0).get(i) != null) && (!"".equals(allData.get(0).get(i))) ){
-            myHeader.add(allData.get(0).get(i).toLowerCase().trim());
-            // Comtempla caso più spazi tra "adj close"
+            if ((allData.get(0).get(i) != null) && (!"".equals(allData.get(0).get(i)))) {
+                myHeader.add(allData.get(0).get(i).toLowerCase().trim());
+                // Comtempla caso più spazi tra "adj close"
             }
         }
         return myHeader;
     }
-    
+
     public static String getColNameFromIndex(int index, ArrayList<ArrayList<String>> datas) {
         //Return the name of the column whose column index is "index"
-        
+
         String columnHeaderName = datas.get(0).get(index);
         return columnHeaderName;
     }
-    
-       public void save(ArrayList<String[]> list, String pathSaveDwlCSV){
+
+    public void save(ArrayList<String[]> list, String pathSaveDwlCSV) {
         File file;
         String pathFileName = pathSaveDwlCSV; // Add TK name
         file = new File(pathFileName);
-        if(!file.exists()){
+        if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create File " + e);
             }
         }
-        try {           
+        try {
             FileWriter writer = new FileWriter(file);
-            for(int i = 0; i < list.size(); i++){
-                String[] row = list.get(i); 
-                for(int j = 0; j < row.length; j++)
-                {
+            for (int i = 0; i < list.size(); i++) {
+                String[] row = list.get(i);
+                for (int j = 0; j < row.length; j++) {
                     writer.write(row[j]);
-                    if(j != (row.length - 1)){
+                    if (j != (row.length - 1)) {
                         writer.write(',');
-                    }
-                    else{
+                    } else {
                         writer.write('\n');
                     }
                 }
@@ -218,16 +216,17 @@ public class ManageExcel {
             throw new RuntimeException("Unable to write to File " + e);
         }
     }
-    
+
        public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName){
-        Workbook myWb = new HSSFWorkbook();          //Workbook wb = new XSSFWorkbook();
+        Workbook myWb = new XSSFWorkbook();          //Workbook wb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
       
         String mySheetName = "Mensile";
         addSheet2Excel(myWb, myCreateHelper, mySheetName, myTicker);
 
         // Write the output to a file
-        String outputFilePath = userSavePath + File.separator +fileName + ".xls";
+        String outputFilePath = userSavePath + File.separator +fileName + ".xlsx";
+        // System.out.println(outputFilePath);
         FileOutputStream fileOut;
         try {
             fileOut = new FileOutputStream(outputFilePath);
@@ -243,6 +242,8 @@ public class ManageExcel {
         
         
        }
+ 
+
     /**
      * @param args the command line arguments
      */
