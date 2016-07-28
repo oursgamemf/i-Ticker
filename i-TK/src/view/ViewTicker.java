@@ -32,6 +32,8 @@ import javax.swing.JFileChooser;
 import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getAllDataFromFile;
 import static controller.TickerController.sortTicker;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  *
@@ -69,9 +71,10 @@ public class ViewTicker extends javax.swing.JFrame {
     public void write2configFile(String selectedPath) throws FileNotFoundException, IOException {
         File inputFile = new File(TickerController.getConfigFullPath());
         File tempFile = new File(TickerController.getConfigTempFullPath());
-
+         
         BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-        BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile),"UTF-8"));
+        //BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
         String lineToReplace = "savedTickerPath=";
         String currentLine;

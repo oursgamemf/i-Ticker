@@ -12,11 +12,13 @@ import static controller.TickerController.getRowTickerArray;//??
 import controller.RowTicker;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,8 +119,8 @@ public class ManageExcel {
 
     public static ArrayList<ArrayList<String>> getAllDataFromFile(String csvInputPath, char sep) {
         // Get datas from csv file to ArrayList of ArrayList
-        ArrayList<ArrayList<String>> allData = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader(csvInputPath), sep);) {
+        ArrayList<ArrayList<String>> allData = new ArrayList<>();         
+        try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(csvInputPath)), sep, '"', '|');) {
             String[] nextLine;
             int numRow = 0;
             while ((nextLine = reader.readNext()) != null && numRow < 8000) {
