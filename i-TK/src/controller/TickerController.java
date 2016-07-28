@@ -37,6 +37,8 @@ import java.util.Calendar;
 import model.DBtkEvo;
 import org.apache.commons.io.FileUtils;
 import static controller.ManageExcel.getAllDataFromFile;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * @author emanuele
@@ -164,8 +166,11 @@ public class TickerController  {
         ArrayList<RowTicker> myTicker = new ArrayList<RowTicker>();
         ArrayList<String> headers = getHeaderList(datas);
         Integer colNumber = headers.size();
-
-        for (int row = 1; datas.get(row) != null; row++) {
+        ////////////////////////////////////////////////////////////////////////
+        // Change "row = row + 2" with: "row++"
+        // Then go to the next showy comment for a last changing
+        ////////////////////////////////////////////////////////////////////////
+        for (int row = 1; datas.get(row) != null; row = row + 2) { 
 
             RowTicker myRowTicker = new RowTicker();
 
@@ -205,7 +210,10 @@ public class TickerController  {
 
             myTicker.add(myRowTicker);
             try {
-                datas.get(row + 1);
+                ////////////////////////////////////////////////////////////////
+                // Change "row + 2" with: "row + 1"
+                ////////////////////////////////////////////////////////////////
+                datas.get(row + 2);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 break;
             }
@@ -255,7 +263,7 @@ public class TickerController  {
         return url;
     }
     
-    public RowChoosenTks addTkChoosenInOBJ(DBtkEvo usingDB,String table,String ticker){
+    public static RowChoosenTks addTkChoosenInOBJ(DBtkEvo usingDB,String table,String ticker){
         Boolean isAlreadyIn = usingDB.checkIfAlreadyIn(table,ticker);
         RowChoosenTks rct = new RowChoosenTks();
         if (!isAlreadyIn){
@@ -289,4 +297,14 @@ public class TickerController  {
         }
 
     }
+    
+    public static ArrayList<RowTicker> sortTicker (ArrayList<RowTicker> myTicker){
+        Collections.sort(myTicker, new Comparator<RowTicker>() {
+            public int compare(RowTicker tk1, RowTicker tk2) {
+                return tk1.getDateTk().compareTo(tk2.getDateTk());
+            }
+        });
+        return myTicker;
+    }
+
 }

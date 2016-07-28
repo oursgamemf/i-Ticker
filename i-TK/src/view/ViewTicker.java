@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getAllDataFromFile;
+import static controller.TickerController.sortTicker;
 
 /**
  *
@@ -39,7 +40,8 @@ import static controller.ManageExcel.getAllDataFromFile;
 public class ViewTicker extends javax.swing.JFrame {
 
     public static TickerController tkC = new TickerController();
-    public static String outputExcelFile  = "none";
+    public static String outputExcelFile = "none";
+
     /**
      * Creates new form ViewTicker
      */
@@ -53,21 +55,18 @@ public class ViewTicker extends javax.swing.JFrame {
         } // From here setList has all config data
         outputExcelFile = setList.get(8);
         //RowTicker rrt = myStmtDB.getAllFromDBData(); // get data from DB
-        
+
         // Initialize the UI
         initComponents();
-        
+
         // Enable or disable the search Button
         // String pathTKsaved = setList.get(8);
         //buttonEnabling(pathTKsaved);
         buttonEnabling();
-        
-    }
-    
-                                     
 
-     
-    public void write2configFile(String selectedPath) throws FileNotFoundException, IOException{
+    }
+
+    public void write2configFile(String selectedPath) throws FileNotFoundException, IOException {
         File inputFile = new File(TickerController.getConfigFullPath());
         File tempFile = new File(TickerController.getConfigTempFullPath());
 
@@ -77,24 +76,23 @@ public class ViewTicker extends javax.swing.JFrame {
         String lineToReplace = "savedTickerPath=";
         String currentLine;
 
-        while((currentLine = reader.readLine()) != null) {
+        while ((currentLine = reader.readLine()) != null) {
             // trim newline when comparing with lineToRemove
             String trimmedLine = currentLine.trim();
             String[] rowElement = trimmedLine.split(";");
-            if(rowElement[0].equals(lineToReplace)){
+            if (rowElement[0].equals(lineToReplace)) {
                 writer.write(rowElement[0] + ";" + selectedPath + ";" + System.getProperty("line.separator"));
-            }else{
+            } else {
                 writer.write(currentLine + System.getProperty("line.separator"));
             }
         }
-        writer.close(); 
+        writer.close();
         reader.close();
         inputFile.delete();
         boolean successful = tempFile.renameTo(inputFile);
         System.out.println(successful);
     }
-    
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -111,6 +109,7 @@ public class ViewTicker extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -138,6 +137,20 @@ public class ViewTicker extends javax.swing.JFrame {
         jSplitPane3.setLeftComponent(jTextField1);
 
         jSplitPane2.setTopComponent(jSplitPane3);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTable1);
+
         jSplitPane2.setRightComponent(jScrollPane3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -155,19 +168,19 @@ public class ViewTicker extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-          // TODO add your handling code here:
+        // TODO add your handling code here:
         //Create a file chooser
         final JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         //In response to a button click:
         int result = fc.showOpenDialog(jButton1);
-       
+
         if (result == JFileChooser.APPROVE_OPTION) {
-                String selectedPath = fc.getSelectedFile().getAbsolutePath();
+            String selectedPath = fc.getSelectedFile().getAbsolutePath();
             System.out.println("Open was selected: " + selectedPath);
             try {
                 write2configFile(selectedPath);
-                outputExcelFile  = selectedPath;
+                outputExcelFile = selectedPath;
 
             } catch (IOException ex) {
                 Logger.getLogger(ViewTicker.class.getName()).log(Level.SEVERE, null, ex);
@@ -183,38 +196,39 @@ public class ViewTicker extends javax.swing.JFrame {
         // TODO add your handling code here:
         String tickerName = jTextField1.getText();
         Boolean isWebConn = TickerController.getWebConnection();
-        if(isWebConn){
+        if (isWebConn) {
             String myTKs = TickerController.makeURL(tickerName);
             TickerController.searchSaveTK(myTKs, tickerName);
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tickerName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
-            ManageExcel.createExcel(myTicker,outputExcelFile, tickerName);
-            
-        }
-        else {
+            ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+
+            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
+            //TickerController.addTkChoosenInOBJ();
+
+        } else {
             System.out.println("Controllare la connessione ad internet");
         }
-        
-        
-        
+
+
     }//GEN-LAST:event_jButton2ActionPerformed
-    
-    private void buttonEnabling(){
-        if (outputExcelFile.equals("none")){
+
+    private void buttonEnabling() {
+        if (outputExcelFile.equals("none")) {
             jButton2.setEnabled(false);
-        }else{
+        } else {
             jButton2.setEnabled(true);
         }
     }
-    
-    private void buttonEnabling(String pathConfigFile){
-        if (pathConfigFile.equals("none")){
+
+    private void buttonEnabling(String pathConfigFile) {
+        if (pathConfigFile.equals("none")) {
             jButton2.setEnabled(false);
-        }else{
+        } else {
             jButton2.setEnabled(true);
         }
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -257,16 +271,14 @@ public class ViewTicker extends javax.swing.JFrame {
         //ArrayList<ArrayList<String>> data = getAllDataFromTKFile(testTKSearch, ',');
         //ArrayList<RowTicker> myTicker = getRowTickerArray(data);
         //myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());// Use default query -NEED override this method!!
-     
-
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ViewTicker().setVisible(true);
             }
         });
-        
+
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -274,6 +286,7 @@ public class ViewTicker extends javax.swing.JFrame {
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JSplitPane jSplitPane4;
+    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
