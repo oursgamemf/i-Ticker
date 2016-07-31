@@ -10,7 +10,7 @@ import static controller.ManageExcel.getColNumFromTxt;
 import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileOutputStream;  
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -135,7 +135,7 @@ public class TickerController {
         sessionDB.setsTable(configData.get(1).get(1));
         sessionDB.setsFieldTableCreate(configData.get(2).get(1));
         sessionDB.setQuery(configData.get(3).get(1));
-
+        
         sessionDB.connectOrCreate();
         sessionDB.dropTable(); // Remove it!!!
         sessionDB.createTable();
@@ -155,6 +155,7 @@ public class TickerController {
         loadSet.add(configData.get(6).get(1));
         loadSet.add(configData.get(7).get(1));
         loadSet.add(configData.get(8).get(1));
+        System.out.println(configData.get(8).get(1));
         return loadSet;
     }
 
