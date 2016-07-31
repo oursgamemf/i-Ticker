@@ -10,7 +10,7 @@ import static controller.ManageExcel.getColNumFromTxt;
 import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileOutputStream;  
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,7 +137,7 @@ public class TickerController  {
         sessionDB.setsTable(configData.get(1).get(1));
         sessionDB.setsFieldTableCreate(configData.get(2).get(1));
         sessionDB.setQuery(configData.get(3).get(1));
-
+        
         sessionDB.connectOrCreate();
         sessionDB.dropTable(); // Remove it!!!
         sessionDB.createTable();
@@ -157,6 +157,7 @@ public class TickerController  {
         loadSet.add(configData.get(6).get(1));
         loadSet.add(configData.get(7).get(1));
         loadSet.add(configData.get(8).get(1));
+        System.out.println(configData.get(8).get(1));
         return loadSet;
     }
 
@@ -166,14 +167,12 @@ public class TickerController  {
         ArrayList<RowTicker> myTicker = new ArrayList<RowTicker>();
         ArrayList<String> headers = getHeaderList(datas);
         Integer colNumber = headers.size();
-        ////////////////////////////////////////////////////////////////////////
-        // Change "row = row + 2" with: "row++"
-        // Then go to the next showy comment for a last changing
-        ////////////////////////////////////////////////////////////////////////
-        for (int row = 1; datas.get(row) != null; row = row + 2) { 
+        for (int row = 1; datas.get(row) != null; row++) { 
 
             RowTicker myRowTicker = new RowTicker();
-
+            ////////////////////////////////////////////////////////////////////
+            // Remove the second row of each case statement (but date one)
+            ////////////////////////////////////////////////////////////////////
             for (String h : headers) {
                 Integer col = getColNumFromTxt(h, datas);
                 switch (h.toLowerCase().trim()) {
@@ -183,26 +182,32 @@ public class TickerController  {
                         break;
                     case "open":
                         Double openVal = Double.valueOf(datas.get(row).get(col));
+                        openVal = openVal * Math.random();
                         myRowTicker.setOpenTk(openVal);
                         break;
                     case "high":
                         Double highVal = Double.valueOf(datas.get(row).get(col));
+                        highVal = highVal * Math.random();
                         myRowTicker.setHighTk(highVal);
                         break;
                     case "low":
                         Double lowVal = Double.valueOf(datas.get(row).get(col));
+                        lowVal = lowVal * Math.random();
                         myRowTicker.setLowTk(lowVal);
                         break;
                     case "close":
                         Double closeVal = Double.valueOf(datas.get(row).get(col));
+                        closeVal = closeVal * Math.random();
                         myRowTicker.setCloseTk(closeVal);
                         break;
                     case "volume":
                         Double volumeVal = Double.valueOf(datas.get(row).get(col));
+                        volumeVal = volumeVal * Math.random();
                         myRowTicker.setVolumeTk(volumeVal);
                         break;
                     case "adj close":
                         Double adjCloseVal = Double.valueOf(datas.get(row).get(col));
+                        adjCloseVal = adjCloseVal * Math.random();
                         myRowTicker.setAdjCloseTk(adjCloseVal);
                         break;
                 }
@@ -210,10 +215,7 @@ public class TickerController  {
 
             myTicker.add(myRowTicker);
             try {
-                ////////////////////////////////////////////////////////////////
-                // Change "row + 2" with: "row + 1"
-                ////////////////////////////////////////////////////////////////
-                datas.get(row + 2);
+                datas.get(row + 1);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 break;
             }
@@ -307,4 +309,37 @@ public class TickerController  {
         return myTicker;
     }
 
+    
+    public static ArrayList<RowTicker> getQuarterlyTicker (ArrayList<RowTicker> myTicker){
+        
+        ArrayList<RowTicker> myQuartTicker = new ArrayList<RowTicker>();
+        
+        for (RowTicker myRowTk: myTicker){
+            Calendar calDate = Calendar.getInstance();
+            calDate.setTime(myRowTk.getDateTk());
+            int month = (calDate.get(Calendar.MONTH));
+            if (month == 2 || month == 5 || month == 8 || month == 11){
+                myQuartTicker.add(myRowTk);
+            }
+        }
+        return myQuartTicker;
+    }
+    
+    
+    public static ArrayList<RowTicker> getAnnualTicker (ArrayList<RowTicker> myTicker){
+        
+        ArrayList<RowTicker> myAnnualTicker = new ArrayList<RowTicker>();
+        
+        for (RowTicker myRowTk: myTicker){
+            Calendar calDate = Calendar.getInstance();
+            calDate.setTime(myRowTk.getDateTk());
+            int month = (calDate.get(Calendar.MONTH));
+                System.out.println(month);
+            if (month == 11){
+                myAnnualTicker.add(myRowTk);
+            }
+        }
+        return myAnnualTicker;
+    }
+ 
 }
