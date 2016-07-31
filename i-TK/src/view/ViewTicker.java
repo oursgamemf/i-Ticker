@@ -6,6 +6,7 @@
 package view;
 
 import controller.ManageExcel;
+import static controller.ManageExcel.checkIfExists;
 import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getHeaderList;
 import static controller.ManageExcel.setInputFile;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getAllDataFromFile;
+import controller.RowChoosenTks;
 import static controller.TickerController.sortTicker;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -43,13 +45,16 @@ public class ViewTicker extends javax.swing.JFrame {
 
     public static TickerController tkC = new TickerController();
     public static String outputExcelFile = "none";
+    public static String choosedTKTable = "";
+    public static DBtkEvo myStmtDB = null;
+    public static String queryToInsChTK = "";
 
     /**
      * Creates new form ViewTicker
      */
     public ViewTicker() {
         // Inizialize data from config file: Create or COnn DB - Create two tables return the list of config data.
-        DBtkEvo myStmtDB = (DBtkEvo) runMeAtStart().get(0);
+        myStmtDB = (DBtkEvo) runMeAtStart().get(0);
         ArrayList<String> setList = new ArrayList<>();
         ArrayList<Object> subSetList = runMeAtStart();
         for (int ii = 1; ii < runMeAtStart().size(); ii++) {
@@ -57,6 +62,12 @@ public class ViewTicker extends javax.swing.JFrame {
         } // From here setList has all config data
         outputExcelFile = setList.get(8);
         //RowTicker rrt = myStmtDB.getAllFromDBData(); // get data from DB
+
+        // Set source/target table for choosed TK
+        choosedTKTable = setList.get(4);
+
+        // Query Insert data in CH TK table
+        queryToInsChTK = setList.get(6);
 
         // Initialize the UI
         initComponents();
@@ -71,9 +82,9 @@ public class ViewTicker extends javax.swing.JFrame {
     public void write2configFile(String selectedPath) throws FileNotFoundException, IOException {
         File inputFile = new File(TickerController.getConfigFullPath());
         File tempFile = new File(TickerController.getConfigTempFullPath());
-         
+
         BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile),"UTF-8"));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
         //BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
         String lineToReplace = "savedTickerPath=";
@@ -205,9 +216,23 @@ public class ViewTicker extends javax.swing.JFrame {
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tickerName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
-
+            // Add Choosen TK
+            ArrayList<RowChoosenTks> information = new ArrayList<>();
+            RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tickerName);
+            information.add(myRowCh);
+            Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
+            // end
             ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
-            //TickerController.addTkChoosenInOBJ();
+//            boolean fileAlreadyExists = checkIfExists(tickerName, outputExcelFile);
+//
+//            if (fileAlreadyExists) {
+//
+//                ManageExcel.modifyExcel(myTicker, outputExcelFile, tickerName);
+//
+//            } else {
+//                ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
+//                //TickerController.addTkChoosenInOBJ();
+//            }
 
         } else {
             System.out.println("Controllare la connessione ad internet");

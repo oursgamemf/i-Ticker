@@ -43,9 +43,7 @@ import java.util.Comparator;
 /**
  * @author emanuele
  */
-public class TickerController  {
-    
-    
+public class TickerController {
 
     private static final String URL_TEST_CONN = "https://www.google.it";
     private static final String PATH_TO_CONFIG = "i_tk.config";
@@ -60,7 +58,7 @@ public class TickerController  {
     private static final String insideFullPath = curPath.toString() + File.separator;//curPath.getParent().toString() + File.separator
     private static final String configFullPath = insideFullPath + PATH_TO_CONFIG;
     private static final String configTempFullPath = insideFullPath + PATH_TO_TEMP_CONFIG;
-    
+
 //    public TickerController(){
 //        try {
 //         
@@ -71,7 +69,7 @@ public class TickerController  {
     public static String getInsideFullPath() {
         return insideFullPath;
     }
-    
+
     public static String getConfigTempFullPath() {
         return configTempFullPath;
     }
@@ -141,12 +139,12 @@ public class TickerController  {
         sessionDB.connectOrCreate();
         sessionDB.dropTable(); // Remove it!!!
         sessionDB.createTable();
-        
+
         // Second table
         sessionDB.setsFieldTableCreate(configData.get(4).get(1));
         sessionDB.dropTable(configData.get(4).get(1)); // Remove it!!!
         Boolean testSecDB = sessionDB.createTable(configData.get(4).get(1), configData.get(5).get(1));
-        
+
         loadSet.add(sessionDB);
         loadSet.add(configData.get(0).get(1));
         loadSet.add(configData.get(1).get(1));
@@ -166,14 +164,12 @@ public class TickerController  {
         ArrayList<RowTicker> myTicker = new ArrayList<RowTicker>();
         ArrayList<String> headers = getHeaderList(datas);
         Integer colNumber = headers.size();
-        ////////////////////////////////////////////////////////////////////////
-        // Change "row = row + 2" with: "row++"
-        // Then go to the next showy comment for a last changing
-        ////////////////////////////////////////////////////////////////////////
-        for (int row = 1; datas.get(row) != null; row = row + 2) { 
+        for (int row = 1; datas.get(row) != null; row++) {
 
             RowTicker myRowTicker = new RowTicker();
-
+            ////////////////////////////////////////////////////////////////////
+            // Remove the second row of each case statement (but date one)
+            ////////////////////////////////////////////////////////////////////
             for (String h : headers) {
                 Integer col = getColNumFromTxt(h, datas);
                 switch (h.toLowerCase().trim()) {
@@ -183,26 +179,32 @@ public class TickerController  {
                         break;
                     case "open":
                         Double openVal = Double.valueOf(datas.get(row).get(col));
+                        openVal = openVal * Math.random();
                         myRowTicker.setOpenTk(openVal);
                         break;
                     case "high":
                         Double highVal = Double.valueOf(datas.get(row).get(col));
+                        highVal = highVal * Math.random();
                         myRowTicker.setHighTk(highVal);
                         break;
                     case "low":
                         Double lowVal = Double.valueOf(datas.get(row).get(col));
+                        lowVal = lowVal * Math.random();
                         myRowTicker.setLowTk(lowVal);
                         break;
                     case "close":
                         Double closeVal = Double.valueOf(datas.get(row).get(col));
+                        closeVal = closeVal * Math.random();
                         myRowTicker.setCloseTk(closeVal);
                         break;
                     case "volume":
                         Double volumeVal = Double.valueOf(datas.get(row).get(col));
+                        volumeVal = volumeVal * Math.random();
                         myRowTicker.setVolumeTk(volumeVal);
                         break;
                     case "adj close":
                         Double adjCloseVal = Double.valueOf(datas.get(row).get(col));
+                        adjCloseVal = adjCloseVal * Math.random();
                         myRowTicker.setAdjCloseTk(adjCloseVal);
                         break;
                 }
@@ -210,10 +212,7 @@ public class TickerController  {
 
             myTicker.add(myRowTicker);
             try {
-                ////////////////////////////////////////////////////////////////
-                // Change "row + 2" with: "row + 1"
-                ////////////////////////////////////////////////////////////////
-                datas.get(row + 2);
+                datas.get(row + 1);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 break;
             }
@@ -262,33 +261,34 @@ public class TickerController  {
 
         return url;
     }
-    
-    public static RowChoosenTks addTkChoosenInOBJ(DBtkEvo usingDB,String table,String ticker){
-        Boolean isAlreadyIn = usingDB.checkIfAlreadyIn(table,ticker);
+
+    public static RowChoosenTks addTkChoosenInOBJ(DBtkEvo usingDB, String table, String ticker) {
         RowChoosenTks rct = new RowChoosenTks();
-        if (!isAlreadyIn){
+        RowChoosenTks rctAlreadyIn = usingDB.checkIfAlreadyIn(table, ticker);
+        if ((rctAlreadyIn == null) || (!rctAlreadyIn.getTickerName().equalsIgnoreCase(ticker))) {
             Date a = new Date(Calendar.getInstance().getTime().getTime());
-            java.sql.Date sysDate = new java.sql.Date(a.getTime());          
+            java.sql.Date sysDate = new java.sql.Date(a.getTime());
             rct.setTickerName(ticker.trim());
             rct.setAutomaticRefresh(false);
             rct.setLastDownloadDate(sysDate);
             rct.setRefreshPeriod(10);
+            return rct;
         }
-        return rct;
+        return rctAlreadyIn;
     }
-    
-    public static void searchSaveTK(String fileUrl,String nameTK ) {
+
+    public static void searchSaveTK(String fileUrl, String nameTK) {
         //Code to download
         InputStream input;
         String pathNameDwlCSV = insideFullPath + nameTK.trim() + ".csv";
         File myFile = new File(pathNameDwlCSV);
-        
+
         try {
-            URL myUrl = new URL(fileUrl); 
+            URL myUrl = new URL(fileUrl);
             input = myUrl.openStream();
             FileUtils.copyURLToFile(myUrl, myFile);
             Reader reader = new InputStreamReader(input, "UTF-8");
-            
+
         } catch (MalformedURLException ex) {
             // Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unable to find this Ticker, correct it please.");
@@ -297,14 +297,44 @@ public class TickerController  {
         }
 
     }
-    
-    public static ArrayList<RowTicker> sortTicker (ArrayList<RowTicker> myTicker){
+
+    public static ArrayList<RowTicker> sortTicker(ArrayList<RowTicker> myTicker) {
         Collections.sort(myTicker, new Comparator<RowTicker>() {
             public int compare(RowTicker tk1, RowTicker tk2) {
                 return tk1.getDateTk().compareTo(tk2.getDateTk());
             }
         });
         return myTicker;
+    }
+
+    public static ArrayList<RowTicker> getQuarterlyTicker(ArrayList<RowTicker> myTicker) {
+
+        ArrayList<RowTicker> myQuartTicker = new ArrayList<RowTicker>();
+
+        for (RowTicker myRowTk : myTicker) {
+            Calendar calDate = Calendar.getInstance();
+            calDate.setTime(myRowTk.getDateTk());
+            int month = (calDate.get(Calendar.MONTH));
+            if (month == 2 || month == 5 || month == 8 || month == 11) {
+                myQuartTicker.add(myRowTk);
+            }
+        }
+        return myQuartTicker;
+    }
+
+    public static ArrayList<RowTicker> getAnnualTicker(ArrayList<RowTicker> myTicker) {
+
+        ArrayList<RowTicker> myAnnualTicker = new ArrayList<RowTicker>();
+
+        for (RowTicker myRowTk : myTicker) {
+            Calendar calDate = Calendar.getInstance();
+            calDate.setTime(myRowTk.getDateTk());
+            int month = (calDate.get(Calendar.MONTH));
+            if (month == 11) {
+                myAnnualTicker.add(myRowTk);
+            }
+        }
+        return myAnnualTicker;
     }
 
 }

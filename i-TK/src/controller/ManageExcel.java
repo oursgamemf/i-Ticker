@@ -7,9 +7,12 @@ package controller;
 
 import com.opencsv.CSVReader;
 import static controller.RowExcel.addSheet2Excel;
+import static controller.RowExcel.modifySheet2Excel;
 
 import static controller.TickerController.getRowTickerArray;//??
 import controller.RowTicker;
+import static controller.TickerController.getAnnualTicker;
+import static controller.TickerController.getQuarterlyTicker;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,10 +47,6 @@ public class ManageExcel {
 
     public static void setInputFile(String inputFile) {
         ManageExcel.inputFile = inputFile;
-    }
-
-    public void read() throws IOException {
-
     }
 
     public static int getColNumFromTxt(String headerName, ArrayList<ArrayList<String>> datas) {
@@ -119,7 +118,7 @@ public class ManageExcel {
 
     public static ArrayList<ArrayList<String>> getAllDataFromFile(String csvInputPath, char sep) {
         // Get datas from csv file to ArrayList of ArrayList
-        ArrayList<ArrayList<String>> allData = new ArrayList<>();         
+        ArrayList<ArrayList<String>> allData = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(csvInputPath)), sep, '"', '|');) {
             String[] nextLine;
             int numRow = 0;
@@ -218,13 +217,21 @@ public class ManageExcel {
             throw new RuntimeException("Unable to write to File " + e);
         }
     }
-
-       public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName){
-        Workbook myWb = new XSSFWorkbook();          //Workbook wb = new XSSFWorkbook();
+    
+    public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName){
+        Workbook myWb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
-      
+
         String mySheetName = "Mensile";
         addSheet2Excel(myWb, myCreateHelper, mySheetName, myTicker);
+
+        ArrayList<RowTicker> myQuarterTicker = getQuarterlyTicker(myTicker);
+        String myQuarterSheetName = "Trimestrale";
+        addSheet2Excel(myWb, myCreateHelper, myQuarterSheetName, myQuarterTicker);
+
+        ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
+        String myAnnualSheetName = "Annuale";
+        addSheet2Excel(myWb, myCreateHelper, myAnnualSheetName, myAnnualTicker);
 
         // Write the output to a file
         String outputFilePath = userSavePath + File.separator +fileName + ".xlsx";
@@ -241,10 +248,71 @@ public class ManageExcel {
             //Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unable to write the file I/O Ex");
         }
+
+    }
+    
+    public static boolean checkIfExists(String fileName, String filePath) {
+        boolean exists = false;
+
+        String outputFilePath = filePath + File.separator + fileName + ".xlsx";
+
+        // Create an abstract definition of configuration file to be read.
+        File file = new File(outputFilePath);
+
+        // If configuration file fileName does exist in the current returns true
+        if (file.exists()) {
+            exists = true;
+        }
+
+        return exists;
+    }
+
+    public static void modifyExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName) {
+
+        String inputFilePath = userSavePath + File.separator + fileName + ".xlsx";
+        FileInputStream file = null;
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        try {
+            file = new FileInputStream(inputFilePath);
+            workbook = new XSSFWorkbook(file);
+        } catch (FileNotFoundException ex) {
+            System.out.println("Filw not found in ManageExcel - modifyExcel ");
+        } catch (IOException ex) {
+            System.out.println("Workbook not found in ManageExcel - modifyExcel ");
+        }
+
+        CreationHelper myCrHelper = workbook.getCreationHelper();
+
+        XSSFSheet mySheet = workbook.getSheet("Mensile");
+        System.out.println("start = mensile ");
+        modifySheet2Excel(workbook, myCrHelper, mySheet, myTicker);
+
+        XSSFSheet mySheet1 = workbook.getSheet("Trimestrale");
+        System.out.println("start = Trimestrale ");
+        ArrayList<RowTicker> myQuarterTicker = getQuarterlyTicker(myTicker);
+        modifySheet2Excel(workbook, myCrHelper, mySheet1, myQuarterTicker);
+
+        XSSFSheet mySheet2 = workbook.getSheet("Annuale");
+        System.out.println("start = Annuale ");
+        ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
+        modifySheet2Excel(workbook, myCrHelper, mySheet2, myAnnualTicker);
         
-        
-       }
- 
+        try {
+            file.close();
+        } catch (IOException ex) {
+            System.out.println("Filw not found in ManageExcel - modifyExcel - during Close ");
+        }
+        try {
+            FileOutputStream outFile = new FileOutputStream(new File(inputFilePath));
+            workbook.write(outFile);
+            outFile.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write the file");
+        } catch (IOException e) {
+            System.out.println("Unable to write the file I/O Ex");
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -256,16 +324,16 @@ public class ManageExcel {
 //        for (String tip : setOfData) {
 //            System.out.println(tip);
 //        }
-        
-    ArrayList<RowTicker> myTicker = getRowTickerArray(data);
-    
-    Integer index = 80;
-    System.out.println("Date: " + myTicker.get(index).getDateTk());
-    System.out.println("Open: " + myTicker.get(index).getOpenTk());
-    System.out.println("High: " + myTicker.get(index).getHighTk());
-    System.out.println("Low: " + myTicker.get(index).getLowTk());
-    System.out.println("Close: " + myTicker.get(index).getCloseTk());
-    System.out.println("Volume: " + myTicker.get(index).getVolumeTk());
-    System.out.println("AdjClose: " + myTicker.get(index).getAdjCloseTk());
+
+        ArrayList<RowTicker> myTicker = getRowTickerArray(data);
+
+        Integer index = 80;
+        System.out.println("Date: " + myTicker.get(index).getDateTk());
+        System.out.println("Open: " + myTicker.get(index).getOpenTk());
+        System.out.println("High: " + myTicker.get(index).getHighTk());
+        System.out.println("Low: " + myTicker.get(index).getLowTk());
+        System.out.println("Close: " + myTicker.get(index).getCloseTk());
+        System.out.println("Volume: " + myTicker.get(index).getVolumeTk());
+        System.out.println("AdjClose: " + myTicker.get(index).getAdjCloseTk());
     }
 }

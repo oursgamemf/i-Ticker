@@ -38,19 +38,27 @@ public class DBtkEvo {
     private static final String SELECT_ALL = "SELECT * FROM ";
     private static String ALREADY_IN_DB = "SELECT tk_name FROM ? WHERE tk_name = '?' ";
 
-    public Boolean checkIfAlreadyIn(String tableName, String tkName) {
+    public RowChoosenTks checkIfAlreadyIn(String tableName, String tkName) {
         Connection conn = connectOrCreate();
-        String ifExist = "SELECT tk_name FROM " + tableName + " WHERE tk_name = '" + tkName.trim() + "';";
+        String ifExist = "SELECT * FROM " + tableName + " WHERE tk_name = '" + tkName.trim() + "';";
+        RowChoosenTks rct = new RowChoosenTks();
         try (Statement stmt = conn.createStatement();) {
             ResultSet rs = stmt.executeQuery(ifExist);
             while (rs.next()) {
-                return true;
+                rct.setTickerName(rs.getString("tk_name"));
+                rct.setLastDownloadDate(rs.getDate("date_last_dwl"));
+                Boolean mySelfDL = false;
+                if(rs.getInt("self_dwl")==1)
+                        mySelfDL = true;
+                rct.setAutomaticRefresh(mySelfDL);                
+                rct.setRefreshPeriod(rs.getInt("NEXT_DWL"));
+                return rct;
             }
-            return false;
+            //return rct;
         } catch (SQLException ex) {
             Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        return null;
     }
 
     public String getQuery() {
@@ -285,17 +293,24 @@ public class DBtkEvo {
     public boolean insRowChoosenTKinDB(ArrayList<RowChoosenTks> information, String query, String targetTable) {
         Connection conn = connectOrCreate();
         boolean createSuccessful = false;
+        RowChoosenTks rct = new RowChoosenTks();
         String pstmtUpdate = INSERT + targetTable + " " + query + ";";
         try (PreparedStatement pstmt = conn.prepareStatement(pstmtUpdate);) {
             Date a = new Date(iTimeout);
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
             for (RowChoosenTks rowTT : information) {
-                // date_last_dwl,self_dwl ,NEXT_DWL
-                pstmt.setString(1, rowTT.getTickerName());
-                pstmt.setDate(2, rowTT.getLastDownloadDate());
-                pstmt.setBoolean(3, rowTT.getAutomaticRefresh());
-                pstmt.setInt(4, rowTT.getRefreshPeriod());
-                pstmt.execute();
+                RowChoosenTks rctAlreadyIn = checkIfAlreadyIn(targetTable,rowTT.getTickerName());
+                if (rctAlreadyIn == null){
+                    pstmt.setString(1, rowTT.getTickerName());
+                    pstmt.setDate(2, rowTT.getLastDownloadDate());
+                    int selfDL = 0;
+                    if (rowTT.getAutomaticRefresh())
+                        selfDL = 1;
+                    pstmt.setInt(3,selfDL);
+                    pstmt.setInt(4, rowTT.getRefreshPeriod());
+                    pstmt.execute();
+                    createSuccessful = true;
+                }
             }
 
         } catch (SQLException ex) {

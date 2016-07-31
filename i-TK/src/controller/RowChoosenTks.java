@@ -17,7 +17,7 @@ public class RowChoosenTks {
     private Date lastDownloadDate;
     private Boolean automaticRefresh;
     private int refreshPeriod;
-
+    
     public Date getLastDownloadDate() {
         return lastDownloadDate;
     }
@@ -47,7 +47,7 @@ public class RowChoosenTks {
     }
 
     public void setTickerName(String lowTk) {
-        this.tickerName = tickerName;
+        this.tickerName = lowTk;
     }
    
 }
