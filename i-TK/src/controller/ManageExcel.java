@@ -10,6 +10,8 @@ import static controller.RowExcel.addSheet2Excel;
 
 import static controller.TickerController.getRowTickerArray;//??
 import controller.RowTicker;
+import static controller.TickerController.getAnnualTicker;
+import static controller.TickerController.getQuarterlyTicker;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -220,11 +222,19 @@ public class ManageExcel {
     }
 
        public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName){
-        Workbook myWb = new XSSFWorkbook();          //Workbook wb = new XSSFWorkbook();
+        Workbook myWb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
       
         String mySheetName = "Mensile";
         addSheet2Excel(myWb, myCreateHelper, mySheetName, myTicker);
+        
+        ArrayList<RowTicker> myQuarterTicker = getQuarterlyTicker(myTicker);
+        String myQuarterSheetName = "Trimestrale";
+        addSheet2Excel(myWb, myCreateHelper, myQuarterSheetName, myQuarterTicker);
+        
+        ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
+        String myAnnualSheetName = "Annuale";
+        addSheet2Excel(myWb, myCreateHelper, myAnnualSheetName, myAnnualTicker);
 
         // Write the output to a file
         String outputFilePath = userSavePath + File.separator +fileName + ".xlsx";
