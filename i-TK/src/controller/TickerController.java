@@ -155,7 +155,6 @@ public class TickerController {
         loadSet.add(configData.get(6).get(1));
         loadSet.add(configData.get(7).get(1));
         loadSet.add(configData.get(8).get(1));
-        System.out.println(configData.get(8).get(1));
         return loadSet;
     }
 
