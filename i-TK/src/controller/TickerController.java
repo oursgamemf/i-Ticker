@@ -5,13 +5,9 @@
  */
 package controller;
 
-import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getColNumFromTxt;
 import static controller.ManageExcel.getHeaderList;
-import static controller.ManageExcel.setInputFile;
 import java.io.File;
-import java.io.FileOutputStream;  
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,26 +15,19 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.sql.Date;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import model.DBtkEvo;
 import org.apache.commons.io.FileUtils;
 import static controller.ManageExcel.getAllDataFromFile;
 import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * @author emanuele
@@ -128,7 +117,7 @@ public class TickerController {
     public static ArrayList<Object> runMeAtStart() {
         //Linux
         //.getParent()
-        ArrayList<Object> loadSet = new ArrayList<Object>();
+        ArrayList<Object> loadSet = new ArrayList<>();
         ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath, ';');
         DBtkEvo sessionDB = new DBtkEvo();
         sessionDB.setsDBname(configData.get(0).get(1));
@@ -161,7 +150,7 @@ public class TickerController {
     public static ArrayList<RowTicker> getRowTickerArray(ArrayList<ArrayList<String>> datas) {
         // Return an Array whose elements are instances of the class RowTicker.
 
-        ArrayList<RowTicker> myTicker = new ArrayList<RowTicker>();
+        ArrayList<RowTicker> myTicker = new ArrayList<>();
         ArrayList<String> headers = getHeaderList(datas);
         Integer colNumber = headers.size();
         for (int row = 1; datas.get(row) != null; row++) {
@@ -299,41 +288,37 @@ public class TickerController {
     }
 
     public static ArrayList<RowTicker> sortTicker(ArrayList<RowTicker> myTicker) {
-        Collections.sort(myTicker, new Comparator<RowTicker>() {
-            public int compare(RowTicker tk1, RowTicker tk2) {
-                return tk1.getDateTk().compareTo(tk2.getDateTk());
-            }
-        });
+        Collections.sort(myTicker, (RowTicker tk1, RowTicker tk2) -> tk1.getDateTk().compareTo(tk2.getDateTk()));
         return myTicker;
     }
 
     public static ArrayList<RowTicker> getQuarterlyTicker(ArrayList<RowTicker> myTicker) {
 
-        ArrayList<RowTicker> myQuartTicker = new ArrayList<RowTicker>();
+        ArrayList<RowTicker> myQuartTicker = new ArrayList<>();
 
-        for (RowTicker myRowTk : myTicker) {
+        myTicker.stream().forEach((myRowTk) -> {
             Calendar calDate = Calendar.getInstance();
             calDate.setTime(myRowTk.getDateTk());
             int month = (calDate.get(Calendar.MONTH));
             if (month == 2 || month == 5 || month == 8 || month == 11) {
                 myQuartTicker.add(myRowTk);
             }
-        }
+        });
         return myQuartTicker;
     }
 
     public static ArrayList<RowTicker> getAnnualTicker(ArrayList<RowTicker> myTicker) {
 
-        ArrayList<RowTicker> myAnnualTicker = new ArrayList<RowTicker>();
+        ArrayList<RowTicker> myAnnualTicker = new ArrayList<>();
 
-        for (RowTicker myRowTk : myTicker) {
+        myTicker.stream().forEach((myRowTk) -> {
             Calendar calDate = Calendar.getInstance();
             calDate.setTime(myRowTk.getDateTk());
             int month = (calDate.get(Calendar.MONTH));
             if (month == 11) {
                 myAnnualTicker.add(myRowTk);
             }
-        }
+        });
         return myAnnualTicker;
     }
 

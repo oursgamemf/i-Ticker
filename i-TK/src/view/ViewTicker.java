@@ -7,31 +7,22 @@ package view;
 
 import controller.ManageExcel;
 import static controller.ManageExcel.checkIfExists;
-import static controller.ManageExcel.getAllDataFromFile;
-import static controller.ManageExcel.getHeaderList;
-import static controller.ManageExcel.setInputFile;
 import controller.RowTicker;
 import controller.TickerController;
 import static controller.TickerController.getRowTickerArray;
 import static controller.TickerController.runMeAtStart;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import model.DBtkEvo;
-import static controller.ManageExcel.getAllDataFromFile;
 import static controller.ManageExcel.getAllDataFromTKFile;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import static controller.ManageExcel.getAllDataFromFile;
-import static controller.ManageExcel.getAllDataFromFile;
 import controller.RowChoosenTks;
 import static controller.TickerController.sortTicker;
 import java.io.FileOutputStream;
@@ -83,25 +74,25 @@ public class ViewTicker extends javax.swing.JFrame {
         File inputFile = new File(TickerController.getConfigFullPath());
         File tempFile = new File(TickerController.getConfigTempFullPath());
 
-        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"));
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile)); BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "UTF-8"))
         //BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-
-        String lineToReplace = "savedTickerPath=";
-        String currentLine;
-
-        while ((currentLine = reader.readLine()) != null) {
-            // trim newline when comparing with lineToRemove
-            String trimmedLine = currentLine.trim();
-            String[] rowElement = trimmedLine.split(";");
-            if (rowElement[0].equals(lineToReplace)) {
-                writer.write(rowElement[0] + ";" + selectedPath + ";" + System.getProperty("line.separator"));
-            } else {
-                writer.write(currentLine + System.getProperty("line.separator"));
+        ) {
+            
+            String lineToReplace = "savedTickerPath=";
+            String currentLine;
+            
+            while ((currentLine = reader.readLine()) != null) {
+                // trim newline when comparing with lineToRemove
+                String trimmedLine = currentLine.trim();
+                String[] rowElement = trimmedLine.split(";");
+                if (rowElement[0].equals(lineToReplace)) {
+                    writer.write(rowElement[0] + ";" + selectedPath + ";" + System.getProperty("line.separator"));
+                } else {
+                    writer.write(currentLine + System.getProperty("line.separator"));
+                }
             }
         }
-        writer.close();
-        reader.close();
+        //BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
         inputFile.delete();
         boolean successful = tempFile.renameTo(inputFile);
         System.out.println(successful);
@@ -122,8 +113,10 @@ public class ViewTicker extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
+        jTextField2 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -152,7 +145,10 @@ public class ViewTicker extends javax.swing.JFrame {
 
         jSplitPane2.setTopComponent(jSplitPane3);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jSplitPane1.setDividerLocation(230);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -163,9 +159,16 @@ public class ViewTicker extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane3.setViewportView(jTable1);
+        jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jScrollPane1.setViewportView(jTable2);
 
-        jSplitPane2.setRightComponent(jScrollPane3);
+        jSplitPane1.setTopComponent(jScrollPane1);
+
+        jTextField2.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        jTextField2.setText("jTextField2");
+        jSplitPane1.setRightComponent(jTextField2);
+
+        jSplitPane2.setRightComponent(jSplitPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -261,7 +264,7 @@ public class ViewTicker extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[])  {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -284,26 +287,11 @@ public class ViewTicker extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ViewTicker.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-//        System.out.println("My relative Path:");
-//        System.out.println(new File(".").getCanonicalPath());
 
-        //DBtkEvo myStmtDB = (DBtkEvo) runMeAtStart().get(0);
-        //ArrayList<String> setList = new ArrayList<>();
-        //ArrayList<Object> subSetList = runMeAtStart();
-        //subSetList = subSetList.subList(1,runMeAtStart().size());
-        //for (int ii = 1; ii < runMeAtStart().size(); ii++) {
-        //    setList.add((String) subSetList.get(ii));
-        //}
-        //String testTKSearch = "PHAU.MI";
-        //String myTKs = TickerController.makeURL(testTKSearch);
-        //TickerController.searchSaveTK(myTKs, testTKSearch);
-        //ArrayList<ArrayList<String>> data = getAllDataFromTKFile(testTKSearch, ',');
         //ArrayList<RowTicker> myTicker = getRowTickerArray(data);
         //myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());// Use default query -NEED override this method!!
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ViewTicker().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new ViewTicker().setVisible(true);
         });
 
     }
@@ -311,11 +299,13 @@ public class ViewTicker extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JSplitPane jSplitPane4;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }
