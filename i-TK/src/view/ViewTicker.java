@@ -227,10 +227,11 @@ public class ViewTicker extends javax.swing.JFrame {
 
             if (fileAlreadyExists) {
 
-                ManageExcel.modifyExcel(myTicker, outputExcelFile, tickerName);
-
+                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tickerName);
+                
             } else {
-                ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
+                
+                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tickerName);
                 //TickerController.addTkChoosenInOBJ();
             }
 

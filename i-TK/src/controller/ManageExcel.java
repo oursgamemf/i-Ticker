@@ -34,6 +34,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -294,6 +295,7 @@ public class ManageExcel {
         ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
         modifySheet2Excel(workbook, myCrHelper, mySheet2, myAnnualTicker);
         
+        XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
         try {
             file.close();
         } catch (IOException ex) {
