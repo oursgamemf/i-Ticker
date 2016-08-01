@@ -80,9 +80,7 @@ public class RowExcel {
         int row = 1;
         for (RowTicker myRowTk : myTicker) {
             Row myRow = mySheet.getRow(row);
-            //System.out.println(myRow);
             if (myRow == null || myRow.getCell(0) == null || myRow.getCell(1) == null || myRow.getCell(2) == null || myRow.getCell(3) == null ){
-                System.out.println(row + " null");
                 myRow = mySheet.createRow(row);
                 addRow2Excel(myWb, myCrHelper, myRow, myRowTk);
             }else{

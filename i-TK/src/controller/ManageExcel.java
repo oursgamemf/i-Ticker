@@ -284,16 +284,13 @@ public class ManageExcel {
         CreationHelper myCrHelper = workbook.getCreationHelper();
 
         XSSFSheet mySheet = workbook.getSheet("Mensile");
-        System.out.println("start = mensile ");
         modifySheet2Excel(workbook, myCrHelper, mySheet, myTicker);
 
         XSSFSheet mySheet1 = workbook.getSheet("Trimestrale");
-        System.out.println("start = Trimestrale ");
         ArrayList<RowTicker> myQuarterTicker = getQuarterlyTicker(myTicker);
         modifySheet2Excel(workbook, myCrHelper, mySheet1, myQuarterTicker);
 
         XSSFSheet mySheet2 = workbook.getSheet("Annuale");
-        System.out.println("start = Annuale ");
         ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
         modifySheet2Excel(workbook, myCrHelper, mySheet2, myAnnualTicker);
         
