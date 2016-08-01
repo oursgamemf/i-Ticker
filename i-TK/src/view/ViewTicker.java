@@ -222,17 +222,17 @@ public class ViewTicker extends javax.swing.JFrame {
             information.add(myRowCh);
             Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
             // end
-            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
-//            boolean fileAlreadyExists = checkIfExists(tickerName, outputExcelFile);
-//
-//            if (fileAlreadyExists) {
-//
-//                ManageExcel.modifyExcel(myTicker, outputExcelFile, tickerName);
-//
-//            } else {
-//                ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
-//                //TickerController.addTkChoosenInOBJ();
-//            }
+//            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
+            boolean fileAlreadyExists = checkIfExists(tickerName, outputExcelFile);
+
+            if (fileAlreadyExists) {
+
+                ManageExcel.modifyExcel(myTicker, outputExcelFile, tickerName);
+
+            } else {
+                ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
+                //TickerController.addTkChoosenInOBJ();
+            }
 
         } else {
             System.out.println("Controllare la connessione ad internet");

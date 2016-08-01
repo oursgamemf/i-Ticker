@@ -55,7 +55,7 @@ public class RowExcel {
         mySheet.autoSizeColumn(0, false);
     }
 
-    public static void modifyRow2Excel(Workbook myWb, CreationHelper myCrHelper, RowTicker myRowTk, Row myRow) {
+   public static void modifyRow2Excel(Workbook myWb, CreationHelper myCrHelper, RowTicker myRowTk, Row myRow) {
         Cell myCell;
 
         CellStyle cellStyle = myWb.createCellStyle();
@@ -74,27 +74,37 @@ public class RowExcel {
         myCell.setCellValue(myRowTk.getAdjCloseTk());
     }
 
-    public static void modifySheet2Excel(Workbook myWb, CreationHelper myCrHelper, XSSFSheet mySheet, ArrayList<RowTicker> myTicker) {
+
+       public static void modifySheet2Excel(Workbook myWb, CreationHelper myCrHelper, XSSFSheet mySheet, ArrayList<RowTicker> myTicker) {
 
         int row = 1;
         for (RowTicker myRowTk : myTicker) {
-
             Row myRow = mySheet.getRow(row);
-            modifyRow2Excel(myWb, myCrHelper, myRowTk, myRow);
-
+            //System.out.println(myRow);
+            if (myRow == null || myRow.getCell(0) == null || myRow.getCell(1) == null || myRow.getCell(2) == null || myRow.getCell(3) == null ){
+                System.out.println(row + " null");
+                myRow = mySheet.createRow(row);
+                addRow2Excel(myWb, myCrHelper, myRow, myRowTk);
+            }else{
+                modifyRow2Excel(myWb, myCrHelper, myRowTk, myRow);
+            }
             row += 1;
         }
         // Test
-//        while ((mySheet.getRow(row) != null) || (mySheet.getRow(row).getCell(0)) == null) {
-//            mySheet.getRow(row).getCell(0).setCellValue("");
-//            mySheet.getRow(row).getCell(1).setCellValue("");
-//            mySheet.getRow(row).getCell(2).setCellValue("");
-//            mySheet.getRow(row).getCell(3).setCellValue("");
-//            row += 1;
-//        }
-        //Cell myCell = mySheet.getRow(row).getCell(0);
+        while ((mySheet.getRow(row) != null)) {
+            if ((mySheet.getRow(row).getCell(0)) == null){
+                break;
+            }else{
+                mySheet.getRow(row).getCell(0).setCellValue("");
+                mySheet.getRow(row).getCell(1).setCellValue("");
+                mySheet.getRow(row).getCell(2).setCellValue("");
+                mySheet.getRow(row).getCell(3).setCellValue("");
+                row += 1;
+            }
+        } 
         // end test
         mySheet.autoSizeColumn(0, false);
     }
+
 
 }

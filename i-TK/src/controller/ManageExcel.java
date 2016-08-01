@@ -276,7 +276,7 @@ public class ManageExcel {
             file = new FileInputStream(inputFilePath);
             workbook = new XSSFWorkbook(file);
         } catch (FileNotFoundException ex) {
-            System.out.println("Filw not found in ManageExcel - modifyExcel ");
+            System.out.println("File not found in ManageExcel - modifyExcel ");
         } catch (IOException ex) {
             System.out.println("Workbook not found in ManageExcel - modifyExcel ");
         }
