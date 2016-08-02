@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTextField;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
@@ -202,7 +203,7 @@ public class ManageExcel {
         }
     }
 
-    public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName) {
+    public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
         Workbook myWb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
 
@@ -225,12 +226,17 @@ public class ManageExcel {
             fileOut = new FileOutputStream(outputFilePath);
             myWb.write(fileOut);
             fileOut.close();
+            OutputMessage.setOutputText("\'" + fileName + "\' salvato correttamente", txtField);
         } catch (FileNotFoundException ex) {
             //Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unable to write the file");
+            //System.out.println("Unable to write the file");
+            String outMessage = "Impossibile scrivere il file: \'" + fileName + "\'";
+            OutputMessage.setOutputText(outMessage, txtField, 2);
         } catch (IOException ex) {
             //Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unable to write the file I/O Ex");
+            //System.out.println("Unable to write the file I/O Ex");
+            String outMessage = "Impossibile scrivere il file: \'" + fileName + "\'";
+            OutputMessage.setOutputText(outMessage, txtField, 2);
         }
 
     }
@@ -251,7 +257,7 @@ public class ManageExcel {
         return exists;
     }
 
-    public static void modifyExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName) {
+    public static void modifyExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
 
         String inputFilePath = userSavePath + File.separator + fileName + ".xlsx";
         FileInputStream file = null;
@@ -261,8 +267,12 @@ public class ManageExcel {
             workbook = new XSSFWorkbook(file);
         } catch (FileNotFoundException ex) {
             System.out.println("File not found in ManageExcel - modifyExcel ");
+            String outMessage = "Impossibile leggere il file: \'" + fileName + "\'";
+            OutputMessage.setOutputText(outMessage, txtField, 2);
         } catch (IOException ex) {
             System.out.println("Workbook not found in ManageExcel - modifyExcel ");
+            String outMessage = "Impossibile leggere il file: \'" + fileName + "\'";
+            OutputMessage.setOutputText(outMessage, txtField, 2);
         }
 
         CreationHelper myCrHelper = workbook.getCreationHelper();
@@ -286,10 +296,15 @@ public class ManageExcel {
         }
         try (FileOutputStream outFile = new FileOutputStream(new File(inputFilePath))) {
             workbook.write(outFile);
+            OutputMessage.setOutputText("\'" + fileName + "\' modificato correttamente", txtField);
         } catch (FileNotFoundException e) {
             System.out.println("Unable to write the file");
+            String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
+            OutputMessage.setOutputText(outMessage, txtField, 2);
         } catch (IOException e) {
             System.out.println("Unable to write the file I/O Ex");
+            String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
+            OutputMessage.setOutputText(outMessage, txtField, 2);
         }
     }
 
