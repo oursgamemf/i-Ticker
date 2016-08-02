@@ -28,6 +28,7 @@ import model.DBtkEvo;
 import org.apache.commons.io.FileUtils;
 import static controller.ManageExcel.getAllDataFromFile;
 import java.util.Collections;
+import javax.swing.JTextField;
 
 /**
  * @author emanuele
@@ -266,7 +267,7 @@ public class TickerController {
         return rctAlreadyIn;
     }
 
-    public static void searchSaveTK(String fileUrl, String nameTK) {
+    public static void searchSaveTK(String fileUrl, String nameTK, JTextField txtField) {
         //Code to download
         InputStream input;
         String pathNameDwlCSV = insideFullPath + nameTK.trim() + ".csv";
@@ -281,8 +282,13 @@ public class TickerController {
         } catch (MalformedURLException ex) {
             // Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unable to find this Ticker, correct it please.");
+            String outMsg = "Impossibile scaricare il file: \'" + nameTK + "\'. Ticker non valido";
+            OutputMessage.setOutputText(outMsg, txtField, 2);
         } catch (IOException ex) {
             Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unable to find this Ticker, correct it please1.");
+            String outMsg = "Impossibile scaricare il file: \'" + nameTK + "\'. Ticker non valido";
+            OutputMessage.setOutputText(outMsg, txtField, 2);
         }
 
     }
