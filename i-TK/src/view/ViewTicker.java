@@ -212,6 +212,7 @@ public class ViewTicker extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        OutputMessage.setOutputText("", jTextField3);
         // TODO add your handling code here:
         //Create a file chooser
         final JFileChooser fc = new JFileChooser();
@@ -292,12 +293,14 @@ public class ViewTicker extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        String tickerName = jTextField1.getText();
+        OutputMessage.setOutputText("", jTextField3);
+        String tickerName = jTextField1.getText().trim().toUpperCase();
         downloadTicker(tickerName);
 
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        OutputMessage.setOutputText("", jTextField3);
         String[] selTks = getTickersFromTable(myTable);
         for (String tks: selTks){
             downloadTicker(tks);
@@ -324,7 +327,7 @@ public class ViewTicker extends javax.swing.JFrame {
         Boolean isWebConn = TickerController.getWebConnection();
         if (isWebConn) {
             String myTKs = TickerController.makeURL(tkName);
-            TickerController.searchSaveTK(myTKs, tkName, jTextField1);
+            TickerController.searchSaveTK(myTKs, tkName, jTextField3);
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
