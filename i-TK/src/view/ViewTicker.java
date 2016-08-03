@@ -34,6 +34,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.plaf.basic.BasicOptionPaneUI;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -132,7 +133,12 @@ public class ViewTicker extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jSplitPane5 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextField2 = new javax.swing.JTextField();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jButton3 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jSplitPane6 = new javax.swing.JSplitPane();
+        jButton4 = new javax.swing.JButton();
+        jTextField3 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -163,10 +169,31 @@ public class ViewTicker extends javax.swing.JFrame {
 
         jSplitPane5.setDividerLocation(230);
         jSplitPane5.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jButton3.setText("Scarica Ticker Selezionato nella Tabella");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jSplitPane1.setTopComponent(jButton3);
+        jSplitPane1.setRightComponent(jScrollPane2);
+
+        jScrollPane1.setViewportView(jSplitPane1);
+
         jSplitPane5.setTopComponent(jScrollPane1);
 
-        jTextField2.setText("jTextField2");
-        jSplitPane5.setRightComponent(jTextField2);
+        jSplitPane6.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jButton4.setText("Rimuovi Ticker Selezionato");
+        jSplitPane6.setTopComponent(jButton4);
+
+        jTextField3.setText("jTextField3");
+        jSplitPane6.setRightComponent(jTextField3);
+
+        jSplitPane5.setRightComponent(jSplitPane6);
 
         jSplitPane2.setRightComponent(jSplitPane5);
 
@@ -210,7 +237,7 @@ public class ViewTicker extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private JTable setTableAtStart() {
-        String[] columnNames = {"Codice", "Ultimo Download", "Auto-Download", "Periodo", ""};
+        String[] columnNames = {"Codice", "Ultimo Download", "Auto-Download", "Periodo", "Download"};
         Object[][] data = {
             {null, null, null, null, null}
         };
@@ -218,7 +245,7 @@ public class ViewTicker extends javax.swing.JFrame {
         table.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setVisible(true);
-        jScrollPane1.getViewport().add(table);
+        jScrollPane2.getViewport().add(table);
         table.setFillsViewportHeight(true);
         return table;
     }
@@ -236,6 +263,8 @@ public class ViewTicker extends javax.swing.JFrame {
 
     private void fillTableFromDB(String tableDBName, DBtkEvo myDB, JTable tableUI) {
         ArrayList<RowChoosenTks> allChosenTKs = myDB.getAllRowChoosenDBData(tableDBName);
+        int ii = 0;
+        System.out.println(allChosenTKs.size());
         for (RowChoosenTks tcTK : allChosenTKs) {
             DefaultTableModel modelDef = (DefaultTableModel) tableUI.getModel();
             Object[][] data = {
@@ -243,15 +272,19 @@ public class ViewTicker extends javax.swing.JFrame {
             };
             modelDef.addRow(data);
 
-            tableUI.getModel().setValueAt(tcTK.getTickerName(), tableUI.getModel().getRowCount() - 1, 0);
-            tableUI.getModel().setValueAt(tcTK.getLastDownloadDate(), tableUI.getModel().getRowCount() - 1, 1);
-            tableUI.getModel().setValueAt(tcTK.getAutomaticRefresh(), tableUI.getModel().getRowCount() - 1, 2);
-            tableUI.getModel().setValueAt(tcTK.getRefreshPeriod(), tableUI.getModel().getRowCount() - 1, 3);
+            tableUI.getModel().setValueAt(tcTK.getTickerName(), ii, 0);
+            tableUI.getModel().setValueAt(tcTK.getLastDownloadDate(), ii, 1);
+            tableUI.getModel().setValueAt(tcTK.getAutomaticRefresh(), ii , 2);
+            tableUI.getModel().setValueAt(tcTK.getRefreshPeriod(), ii, 3);
+           
+            ii += 1;
+            
         }
+        
 
         //column = tableUI.getColumnModel().getColumn(i);
     }
-
+    
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
@@ -259,7 +292,7 @@ public class ViewTicker extends javax.swing.JFrame {
         Boolean isWebConn = TickerController.getWebConnection();
         if (isWebConn) {
             String myTKs = TickerController.makeURL(tickerName);
-            TickerController.searchSaveTK(myTKs, tickerName, jTextField2);
+            TickerController.searchSaveTK(myTKs, tickerName, jTextField1);
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tickerName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
@@ -279,22 +312,26 @@ public class ViewTicker extends javax.swing.JFrame {
 
             if (fileAlreadyExists) {
 
-                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tickerName, jTextField2);
+                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tickerName, jTextField3);
 
             } else {
 
-                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tickerName, jTextField2);
+                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tickerName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
 
         } else {
             System.out.println("Controllare la connessione ad internet");
             String outMsg = "Impossibile scaricare il file: \'" + tickerName + "\' . Controllare la connessione ad internet";
-            OutputMessage.setOutputText(outMsg, jTextField2, 2);
+            OutputMessage.setOutputText(outMsg, jTextField3, 2);
         }
         fillTableFromDB(choosedTKTable, myStmtDB, myTable); // Da spostare!!!
 
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void buttonEnabling() {
         if (outputExcelFile.equals("none")) {
@@ -350,12 +387,17 @@ public class ViewTicker extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane jSplitPane3;
     private javax.swing.JSplitPane jSplitPane4;
     private javax.swing.JSplitPane jSplitPane5;
+    private javax.swing.JSplitPane jSplitPane6;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
 }
