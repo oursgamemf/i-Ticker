@@ -3,6 +3,7 @@ package model;
 /**
  * @author emanuele
  */
+import com.sun.rowset.CachedRowSetImpl;
 import controller.RowChoosenTks;
 import controller.RowTicker;
 import java.sql.Connection;
@@ -10,12 +11,16 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.rowset.CachedRowSet;
+import javax.swing.table.DefaultTableModel;
 
 public class DBtkEvo {
 
@@ -43,12 +48,15 @@ public class DBtkEvo {
         try (Statement stmt = conn.createStatement();) {
             ResultSet rs = stmt.executeQuery(ifExist);
             while (rs.next()) {
+                Date a = new Date(Calendar.getInstance().getTime().getTime());
+                java.sql.Date sysDate = new java.sql.Date(a.getTime());
                 rct.setTickerName(rs.getString("tk_name"));
-                rct.setLastDownloadDate(rs.getDate("date_last_dwl"));
+                rct.setLastDownloadDate(sysDate);
                 Boolean mySelfDL = false;
-                if(rs.getInt("self_dwl")==1)
-                        mySelfDL = true;
-                rct.setAutomaticRefresh(mySelfDL);                
+                if (rs.getInt("self_dwl") == 1) {
+                    mySelfDL = true;
+                }
+                rct.setAutomaticRefresh(mySelfDL);
                 rct.setRefreshPeriod(rs.getInt("NEXT_DWL"));
                 return rct;
             }
@@ -242,6 +250,44 @@ public class DBtkEvo {
         return rtFromDB;
     }
 
+    public ResultSet getAllRowChoosenDBDataRS(String tableName) {
+        Connection conn = connectOrCreate();
+        String pstmtSelect = SELECT_ALL + tableName + ";";       
+        try (Statement stmt = conn.createStatement();) {
+            ResultSet rs = stmt.executeQuery(pstmtSelect);
+            return rs;
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+      public static DefaultTableModel buildTableModel(ResultSet rs)
+            throws SQLException {
+
+        ResultSetMetaData metaData = rs.getMetaData();
+
+        // names of columns
+        Vector<String> columnNames = new Vector<>();
+        int columnCount = metaData.getColumnCount();
+        for (int column = 1; column <= columnCount; column++) {
+            columnNames.add(metaData.getColumnName(column));
+        }
+
+        // data of the table
+        Vector<Vector<Object>> data = new Vector<>();
+        while (rs.next()) {
+            Vector<Object> vector = new Vector<Object>();
+            for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+                vector.add(rs.getObject(columnIndex));
+            }
+            data.add(vector);
+        }
+
+        return new DefaultTableModel(data, columnNames);
+
+    }
+      
     public ArrayList<RowChoosenTks> getAllRowChoosenDBData(String tableName) {
         ArrayList<RowChoosenTks> outputData = new ArrayList<>();
         RowChoosenTks rtFromDB = new RowChoosenTks();
@@ -297,14 +343,15 @@ public class DBtkEvo {
             Date a = new Date(iTimeout);
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
             for (RowChoosenTks rowTT : information) {
-                RowChoosenTks rctAlreadyIn = checkIfAlreadyIn(targetTable,rowTT.getTickerName());
-                if (rctAlreadyIn == null){
+                RowChoosenTks rctAlreadyIn = checkIfAlreadyIn(targetTable, rowTT.getTickerName());
+                if (rctAlreadyIn == null) {
                     pstmt.setString(1, rowTT.getTickerName());
                     pstmt.setDate(2, rowTT.getLastDownloadDate());
                     int selfDL = 0;
-                    if (rowTT.getAutomaticRefresh())
+                    if (rowTT.getAutomaticRefresh()) {
                         selfDL = 1;
-                    pstmt.setInt(3,selfDL);
+                    }
+                    pstmt.setInt(3, selfDL);
                     pstmt.setInt(4, rowTT.getRefreshPeriod());
                     pstmt.execute();
                     createSuccessful = true;
