@@ -237,14 +237,15 @@ public class ViewTicker extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private JTable setTableAtStart() {
-        String[] columnNames = {"Codice", "Ultimo Download", "Auto-Download", "Periodo", "Download"};
-        Object[][] data = {
-            {null, null, null, null, null}
-        };
+        String[] columnNames = {"Codice", "Ultimo Download", "Auto-Download", "Periodo"};
+        Object[][] data = {};
+//            {null, null, null, null}
+//        };
         JTable table = new javax.swing.JTable();
         table.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setVisible(true);
+        table.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.getViewport().add(table);
         table.setFillsViewportHeight(true);
         return table;
@@ -263,10 +264,14 @@ public class ViewTicker extends javax.swing.JFrame {
 
     private void fillTableFromDB(String tableDBName, DBtkEvo myDB, JTable tableUI) {
         ArrayList<RowChoosenTks> allChosenTKs = myDB.getAllRowChoosenDBData(tableDBName);
+        DefaultTableModel modelDef = (DefaultTableModel) tableUI.getModel();
+        int rowCount = modelDef.getRowCount();
+        //Remove rows one by one from the end of the table
+        for (int i = rowCount - 1; i >= 0; i--) {
+            modelDef.removeRow(i);
+        }
         int ii = 0;
-        System.out.println(allChosenTKs.size());
         for (RowChoosenTks tcTK : allChosenTKs) {
-            DefaultTableModel modelDef = (DefaultTableModel) tableUI.getModel();
             Object[][] data = {
                 {null, null, null, null, null}
             };
@@ -274,63 +279,29 @@ public class ViewTicker extends javax.swing.JFrame {
 
             tableUI.getModel().setValueAt(tcTK.getTickerName(), ii, 0);
             tableUI.getModel().setValueAt(tcTK.getLastDownloadDate(), ii, 1);
-            tableUI.getModel().setValueAt(tcTK.getAutomaticRefresh(), ii , 2);
+            tableUI.getModel().setValueAt(tcTK.getAutomaticRefresh(), ii, 2);
             tableUI.getModel().setValueAt(tcTK.getRefreshPeriod(), ii, 3);
-           
+
             ii += 1;
-            
+
         }
-        
 
         //column = tableUI.getColumnModel().getColumn(i);
     }
-    
+
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         String tickerName = jTextField1.getText();
-        Boolean isWebConn = TickerController.getWebConnection();
-        if (isWebConn) {
-            String myTKs = TickerController.makeURL(tickerName);
-            TickerController.searchSaveTK(myTKs, tickerName, jTextField1);
-            ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tickerName, ',');
-            ArrayList<RowTicker> myTicker = getRowTickerArray(data);
-            ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
-            // Add Choosen TK
-            ArrayList<RowChoosenTks> information = new ArrayList<>();
-            RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tickerName);
-            information.add(myRowCh);
-            Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
-            if (allIn) {
-                // If data are correctly setted in the DB add the Row Into the table
-
-            }
-
-            // end
-//            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
-            boolean fileAlreadyExists = checkIfExists(tickerName, outputExcelFile);
-
-            if (fileAlreadyExists) {
-
-                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tickerName, jTextField3);
-
-            } else {
-
-                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tickerName, jTextField3);
-                //TickerController.addTkChoosenInOBJ();
-            }
-
-        } else {
-            System.out.println("Controllare la connessione ad internet");
-            String outMsg = "Impossibile scaricare il file: \'" + tickerName + "\' . Controllare la connessione ad internet";
-            OutputMessage.setOutputText(outMsg, jTextField3, 2);
-        }
-        fillTableFromDB(choosedTKTable, myStmtDB, myTable); // Da spostare!!!
+        downloadTicker(tickerName);
 
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        String[] selTks = getTickersFromTable(myTable);
+        for (String tks: selTks){
+            downloadTicker(tks);
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void buttonEnabling() {
@@ -348,7 +319,54 @@ public class ViewTicker extends javax.swing.JFrame {
             jButton2.setEnabled(true);
         }
     }
+    
+    private void downloadTicker(String tkName){
+        Boolean isWebConn = TickerController.getWebConnection();
+        if (isWebConn) {
+            String myTKs = TickerController.makeURL(tkName);
+            TickerController.searchSaveTK(myTKs, tkName, jTextField1);
+            ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
+            ArrayList<RowTicker> myTicker = getRowTickerArray(data);
+            ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+            // Add Choosen TK
+            ArrayList<RowChoosenTks> information = new ArrayList<>();
+            RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tkName);
+            information.add(myRowCh);
+            Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
+            if (allIn) {
+                // If data are correctly setted in the DB add the Row Into the table
+            }
+            // end
+//            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
+            boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
+            if (fileAlreadyExists) {
+                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+            } else {
+                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+                //TickerController.addTkChoosenInOBJ();
+            }
 
+        } else {
+            System.out.println("Controllare la connessione ad internet");
+            String outMsg = "Impossibile scaricare il file: \'" + tkName + "\' . Controllare la connessione ad internet";
+            OutputMessage.setOutputText(outMsg, jTextField3, 2);
+        }
+        fillTableFromDB(choosedTKTable, myStmtDB, myTable); // Da spostare!!!
+    }
+  
+    public static String[] getTickersFromTable(JTable tableUI){
+       
+        int selRows[] = tableUI.getSelectedRows();
+        String tkName[] = new String[selRows.length];
+        int index = 0;
+        for(int row: selRows) {
+            DefaultTableModel model = (DefaultTableModel)tableUI.getModel();
+            int tkCol = tableUI.getColumnModel().getColumnIndex("Codice");
+            tkName[index] = model.getValueAt(row, tkCol).toString();
+            index = index + 1;
+        }
+        return tkName;
+    }
     /**
      * @param args the command line arguments
      */

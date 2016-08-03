@@ -290,12 +290,13 @@ public class DBtkEvo {
       
     public ArrayList<RowChoosenTks> getAllRowChoosenDBData(String tableName) {
         ArrayList<RowChoosenTks> outputData = new ArrayList<>();
-        RowChoosenTks rtFromDB = new RowChoosenTks();
+        
         Connection conn = connectOrCreate();
         String pstmtSelect = SELECT_ALL + tableName + ";";
         try (Statement stmt = conn.createStatement();) {
             ResultSet rs = stmt.executeQuery(pstmtSelect);
             while (rs.next()) {
+                RowChoosenTks rtFromDB = new RowChoosenTks();
                 rtFromDB.setTickerName(rs.getString("tk_name"));
                 rtFromDB.setLastDownloadDate(rs.getDate("date_last_dwl"));
                 rtFromDB.setAutomaticRefresh(rs.getBoolean("self_dwl"));
