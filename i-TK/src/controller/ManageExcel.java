@@ -290,11 +290,14 @@ public class ManageExcel {
 
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
         try {
-            file.close();
+            file.close();           
         } catch (IOException ex) {
-            System.out.println("Filw not found in ManageExcel - modifyExcel - during Close ");
+            System.out.println("File not found in ManageExcel - modifyExcel - during Close ");
         }
-        try (FileOutputStream outFile = new FileOutputStream(new File(inputFilePath))) {
+        //
+        File myFile = new File(inputFilePath);       
+        //
+        try (FileOutputStream outFile = new FileOutputStream(myFile)) {
             workbook.write(outFile);
             OutputMessage.setOutputText("\'" + fileName + "\' modificato correttamente", txtField);
         } catch (FileNotFoundException e) {
@@ -306,6 +309,7 @@ public class ManageExcel {
             String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
             OutputMessage.setOutputText(outMessage, txtField, 2);
         }
+    
     }
 
 }

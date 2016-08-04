@@ -213,7 +213,7 @@ public class DBtkEvo {
     
     public void delChoosenTKrow(String tableToBeDrop, String tkName) {
         Connection conn = connectOrCreate();
-        String dropTableDML = "DELETE FROM" + tableToBeDrop + "WHERE TK_NAME LIKE '"+ tkName +"';";
+        String dropTableDML = "DELETE FROM " + tableToBeDrop + " WHERE TK_NAME LIKE '"+ tkName +"';";
         try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
             pstmt.executeUpdate();
         } catch (SQLException ex) {
@@ -326,7 +326,7 @@ public class DBtkEvo {
         ArrayList<RowChoosenTks> outputData = new ArrayList<>();
         
         Connection conn = connectOrCreate();
-        String pstmtSelect = SELECT_ALL + tableName +"WHERE SELF_DWL = 1;";
+        String pstmtSelect = SELECT_ALL + tableName +" WHERE SELF_DWL = 1;";
         try (Statement stmt = conn.createStatement();) {
             ResultSet rs = stmt.executeQuery(pstmtSelect);
             while (rs.next()) {
@@ -338,7 +338,8 @@ public class DBtkEvo {
                 outputData.add(rtFromDB);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("No data mined");
         }
         return outputData;
     }

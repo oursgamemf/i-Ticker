@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import controller.RowChoosenTks;
+import controller.SelfDownloadCaller;
 import static controller.TickerController.sortTicker;
 import java.awt.BorderLayout;
 import java.io.FileOutputStream;
@@ -87,6 +88,9 @@ public class ViewTicker extends javax.swing.JFrame {
 
         // fill Table Model
         fillTableFromDB(choosedTKTable, myStmtDB, myTable);
+
+        SelfDownloadCaller sdc = new SelfDownloadCaller("Update Called", 100, choosedTKTable, myStmtDB, this);
+
     }
 
     public void write2configFile(String selectedPath) throws FileNotFoundException, IOException {
@@ -188,6 +192,11 @@ public class ViewTicker extends javax.swing.JFrame {
         jSplitPane6.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jButton4.setText("Rimuovi Ticker Selezionato");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jSplitPane6.setTopComponent(jButton4);
 
         jTextField3.setText("jTextField3");
@@ -252,17 +261,16 @@ public class ViewTicker extends javax.swing.JFrame {
         return table;
     }
 
-    private JTable recreateUpdatedTable(String tableDBName, DBtkEvo myDB) {
-        ResultSet rs = myDB.getAllRowChoosenDBDataRS(tableDBName);
-        JTable table = new JTable();
-        try {
-            table = new JTable(myDB.buildTableModel(rs));
-        } catch (SQLException ex) {
-            System.out.println("Unable to reach the DB");
-        }
-        return table;
-    }
-
+//    private JTable recreateUpdatedTable(String tableDBName, DBtkEvo myDB) {
+//        ResultSet rs = myDB.getAllRowChoosenDBDataRS(tableDBName);
+//        JTable table = new JTable();
+//        try {
+//            table = new JTable(myDB.buildTableModel(rs));
+//        } catch (SQLException ex) {
+//            System.out.println("Unable to reach the DB");
+//        }
+//        return table;
+//    }
     private void fillTableFromDB(String tableDBName, DBtkEvo myDB, JTable tableUI) {
         ArrayList<RowChoosenTks> allChosenTKs = myDB.getAllRowChoosenDBData(tableDBName);
         DefaultTableModel modelDef = (DefaultTableModel) tableUI.getModel();
@@ -302,10 +310,19 @@ public class ViewTicker extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         OutputMessage.setOutputText("", jTextField3);
         String[] selTks = getTickersFromTable(myTable);
-        for (String tks: selTks){
+        for (String tks : selTks) {
             downloadTicker(tks);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        String[] Tks2Remove = removeRowFromTable(myTable);
+        for (String tk : Tks2Remove) {
+            myStmtDB.delChoosenTKrow(choosedTKTable, tk);
+        }
+
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     private void buttonEnabling() {
         if (outputExcelFile.equals("none")) {
@@ -322,8 +339,8 @@ public class ViewTicker extends javax.swing.JFrame {
             jButton2.setEnabled(true);
         }
     }
-    
-    private void downloadTicker(String tkName){
+
+    public void downloadTicker(String tkName) {
         Boolean isWebConn = TickerController.getWebConnection();
         if (isWebConn) {
             String myTKs = TickerController.makeURL(tkName);
@@ -356,25 +373,82 @@ public class ViewTicker extends javax.swing.JFrame {
         }
         fillTableFromDB(choosedTKTable, myStmtDB, myTable); // Da spostare!!!
     }
-  
-    public static String[] getTickersFromTable(JTable tableUI){
-       
+
+    public void downloadTickerForUpdate(String tkName) {
+        Boolean isWebConn = TickerController.getWebConnection();
+        if (isWebConn) {
+            String myTKs = TickerController.makeURL(tkName);
+            TickerController.searchSaveTK(myTKs, tkName, jTextField3);
+            ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
+            ArrayList<RowTicker> myTicker = getRowTickerArray(data);
+            ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+            // Add Choosen TK
+            ArrayList<RowChoosenTks> information = new ArrayList<>();
+            RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tkName);
+
+            // Update last download
+            boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
+            if (fileAlreadyExists) {
+                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+            } else {
+                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+                //TickerController.addTkChoosenInOBJ();
+            }
+
+        } else {
+            System.out.println("Controllare la connessione ad internet");
+            String outMsg = "Impossibile scaricare il file: \'" + tkName + "\' . Controllare la connessione ad internet";
+            OutputMessage.setOutputText(outMsg, jTextField3, 2);
+        }
+        fillTableFromDB(choosedTKTable, myStmtDB, myTable); // Da spostare!!!
+    }
+
+    public static String[] getTickersFromTable(JTable tableUI) {
+
         int selRows[] = tableUI.getSelectedRows();
         String tkName[] = new String[selRows.length];
         int index = 0;
-        for(int row: selRows) {
-            DefaultTableModel model = (DefaultTableModel)tableUI.getModel();
+        for (int row : selRows) {
+            DefaultTableModel model = (DefaultTableModel) tableUI.getModel();
             int tkCol = tableUI.getColumnModel().getColumnIndex("Codice");
             tkName[index] = model.getValueAt(row, tkCol).toString();
             index = index + 1;
         }
         return tkName;
     }
+
+    public String[] removeRowFromTable(JTable tableUI) {
+        int selRows[] = tableUI.getSelectedRows();
+        String tks2Remove[] = new String[selRows.length];
+        int tkCol = tableUI.getColumnModel().getColumnIndex("Codice");
+
+        int invCounter = 0;
+        for (int row : selRows) {
+            row -= invCounter;
+            DefaultTableModel model = (DefaultTableModel) tableUI.getModel();
+            tks2Remove[invCounter] = model.getValueAt(row, tkCol).toString();
+            model.removeRow(row);
+            invCounter += 1;
+        }
+        return tks2Remove;
+    }
+
+//    public Boolean updateChTKsetTRUE(String tableDBName, DBtkEvo myDB) {
+//        ArrayList<RowChoosenTks> allChosenTKsToBeDWL = myDB.getAllRowChoosenDownlodableDBData(tableDBName);
+//        if (allChosenTKsToBeDWL.size() < 1)
+//            return false;
+//        for (RowChoosenTks rct : allChosenTKsToBeDWL){
+//            downloadTicker(rct.getTickerName());
+//        }
+//        return true;
+//        
+//    }
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
+        //new SelfDownloadCaller("Update Called", 10, tableDBName,  myStmtDB, this);
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
@@ -396,7 +470,6 @@ public class ViewTicker extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ViewTicker.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
         //ArrayList<RowTicker> myTicker = getRowTickerArray(data);
         //myStmtDB.insertRowTKinDB(myTicker, myStmtDB.getQuery());// Use default query -NEED override this method!!
         java.awt.EventQueue.invokeLater(() -> {
