@@ -208,7 +208,20 @@ public class DBtkEvo {
         }
 
     }
+    //DELETE FROM table_name
+    //WHERE [condition];
+    
+    public void delChoosenTKrow(String tableToBeDrop, String tkName) {
+        Connection conn = connectOrCreate();
+        String dropTableDML = "DELETE FROM" + tableToBeDrop + "WHERE TK_NAME LIKE '"+ tkName +"';";
+        try (PreparedStatement pstmt = conn.prepareStatement(dropTableDML);) {
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(" Table " + getsTable() + " not exist");
+        }
 
+    }
+    
     public int fillTable(String DB, String nameTable, String insertColName, String insertValue[]) {
         setsTable(nameTable);
         setsInsertWhere(insertColName);
@@ -308,7 +321,28 @@ public class DBtkEvo {
         }
         return outputData;
     }
-
+    
+    public ArrayList<RowChoosenTks> getAllRowChoosenDownlodableDBData(String tableName) {
+        ArrayList<RowChoosenTks> outputData = new ArrayList<>();
+        
+        Connection conn = connectOrCreate();
+        String pstmtSelect = SELECT_ALL + tableName +"WHERE SELF_DWL = 1;";
+        try (Statement stmt = conn.createStatement();) {
+            ResultSet rs = stmt.executeQuery(pstmtSelect);
+            while (rs.next()) {
+                RowChoosenTks rtFromDB = new RowChoosenTks();
+                rtFromDB.setTickerName(rs.getString("tk_name"));
+                rtFromDB.setLastDownloadDate(rs.getDate("date_last_dwl"));
+                rtFromDB.setAutomaticRefresh(rs.getBoolean("self_dwl"));
+                rtFromDB.setRefreshPeriod(rs.getInt("NEXT_DWL"));
+                outputData.add(rtFromDB);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return outputData;
+    }
+    
     public boolean insertRowTKinDB(ArrayList<RowTicker> information, String query) {
         Connection conn = connectOrCreate();
         boolean createSuccessful = false;
