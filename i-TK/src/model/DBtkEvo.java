@@ -322,6 +322,24 @@ public class DBtkEvo {
         return outputData;
     }
     
+    public RowChoosenTks getRowChoosenDBData(String tableName, String tkName) {      
+        Connection conn = connectOrCreate();
+        String pstmtSelect = SELECT_ALL + tableName + " WHERE TK_NAME LIKE '"+ tkName +"';";
+        RowChoosenTks rtFromDB = new RowChoosenTks();
+        try (Statement stmt = conn.createStatement();) {
+            ResultSet rs = stmt.executeQuery(pstmtSelect);
+            while (rs.next()) {               
+                rtFromDB.setTickerName(rs.getString("tk_name"));
+                rtFromDB.setLastDownloadDate(rs.getDate("date_last_dwl"));
+                rtFromDB.setAutomaticRefresh(rs.getBoolean("self_dwl"));
+                rtFromDB.setRefreshPeriod(rs.getInt("NEXT_DWL"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return rtFromDB;
+    }
+    
     public ArrayList<RowChoosenTks> getAllRowChoosenDownlodableDBData(String tableName) {
         ArrayList<RowChoosenTks> outputData = new ArrayList<>();
         

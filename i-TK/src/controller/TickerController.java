@@ -266,7 +266,18 @@ public class TickerController {
         }
         return rctAlreadyIn;
     }
-
+    
+     public static RowChoosenTks updateTkChoosenInOBJ(RowChoosenTks rct) {
+        if (rct != null) {
+            Date a = new Date(Calendar.getInstance().getTime().getTime());
+            java.sql.Date sysDate = new java.sql.Date(a.getTime());
+            rct.setLastDownloadDate(sysDate);
+            System.out.println("Date Updated");
+            return rct;
+        }
+        return null;
+    }
+     
     public static void searchSaveTK(String fileUrl, String nameTK, JTextField txtField) {
         //Code to download
         InputStream input;

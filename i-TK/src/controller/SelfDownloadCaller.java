@@ -5,7 +5,11 @@
  */
 package controller;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import model.DBtkEvo;
 import view.ViewTicker;
 
@@ -26,9 +30,10 @@ public class SelfDownloadCaller {
                 while (count-- > 0) {
                     System.out.println(mesg);
                     try {
-                        Thread.sleep(10000);	// 100 msec
-                        // If sysdate is > of lastDWL + days 
-                        updateChTKsetTRUE(tableDBName, myDB, vt); 
+                        Thread.sleep(50000);
+                        Boolean someOneNeedUpDate = updateChTKsetTRUE(tableDBName, myDB, vt); 
+                        if (!someOneNeedUpDate)
+                            System.out.println("No Ticker set to be updated");
                     } catch (InterruptedException e) {
                         return;
                     }
@@ -43,14 +48,28 @@ public class SelfDownloadCaller {
     public Boolean updateChTKsetTRUE(String tableDBName, DBtkEvo myDB, ViewTicker vt) {
         ArrayList<RowChoosenTks> allChosenTKsToBeDWL = myDB.getAllRowChoosenDownlodableDBData(tableDBName);
         if (allChosenTKsToBeDWL.size() < 1) {
-            System.out.println("No Ticker need to be update");
             return false;
         }
         for (RowChoosenTks rct : allChosenTKsToBeDWL) {
-            vt.downloadTickerForUpdate(rct.getTickerName()); // Deve aggiornare la data ultimo DWL + sysDate
-            System.out.println("Ticker Updated need to be update");
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(rct.getLastDownloadDate());
+            cal.add(Calendar.DATE, rct.getRefreshPeriod());
+            Calendar nowDate = Calendar.getInstance();
+            System.out.println("-----------");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            System.out.println(sdf.format(cal.getTime()));
+            System.out.println(sdf.format(nowDate.getTime()));
+            System.out.println("-----------");
+            if (!cal.before(nowDate)){
+                vt.downloadTickerForUpdate(rct.getTickerName()); // Deve aggiornare la data ultimo DWL + sysDate
+                System.out.println("Ticker " + rct.getTickerName() +  " Updated");
+            }
+            else {
+                System.out.println("Still not time to Update " + rct.getTickerName());             
+            }
+            return true;
         }
-        return true;
-
+        
+        return false;
     }
 }

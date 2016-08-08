@@ -35,6 +35,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -85,6 +87,7 @@ public class ViewTicker extends javax.swing.JFrame {
 
         // set Table Model
         myTable = setTableAtStart();
+        myTable.getDefaultEditor(String.class).addCellEditorListener(ChangeNotification);
 
         // fill Table Model
         fillTableFromDB(choosedTKTable, myStmtDB, myTable);
@@ -383,9 +386,14 @@ public class ViewTicker extends javax.swing.JFrame {
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
             // Add Choosen TK
+            //get il TK
+            RowChoosenTks rct = myStmtDB.getRowChoosenDBData(choosedTKTable, tkName);
+            // Set new date
+            RowChoosenTks myRowCh = TickerController.updateTkChoosenInOBJ(rct);
+            // Save TK in DB
             ArrayList<RowChoosenTks> information = new ArrayList<>();
-            RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tkName);
-
+            information.add(myRowCh);
+            Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
             // Update last download
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
@@ -433,16 +441,27 @@ public class ViewTicker extends javax.swing.JFrame {
         return tks2Remove;
     }
 
-//    public Boolean updateChTKsetTRUE(String tableDBName, DBtkEvo myDB) {
-//        ArrayList<RowChoosenTks> allChosenTKsToBeDWL = myDB.getAllRowChoosenDownlodableDBData(tableDBName);
-//        if (allChosenTKsToBeDWL.size() < 1)
-//            return false;
-//        for (RowChoosenTks rct : allChosenTKsToBeDWL){
-//            downloadTicker(rct.getTickerName());
-//        }
-//        return true;
-//        
-//    }
+    CellEditorListener ChangeNotification = new CellEditorListener() {
+        public void editingCanceled(ChangeEvent e) {
+            System.out.println("The user canceled editing.");
+        }
+        
+        public void editingStopped(ChangeEvent e) {
+            // Virgy devi scrivere qui le cose che succedono quando si modifica una cella <3
+            System.out.println("The user stopped editing successfully.");
+            
+            // Risalire alla riga modificata
+            
+            // Creare un nuovo oggetto RowChoosenTks
+            
+            // Inserite i dati della riga nell'oggetto
+            
+            // Cancellare la vecchia riga
+            
+            // Inserire quella nuova
+        }
+    };
+
     /**
      * @param args the command line arguments
      */
