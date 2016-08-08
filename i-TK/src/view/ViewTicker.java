@@ -194,6 +194,8 @@ public class ViewTicker extends javax.swing.JFrame {
         jSplitPane5.setTopComponent(jScrollPane1);
 
         jSplitPane6.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane6.setMinimumSize(new java.awt.Dimension(700, 80));
+        jSplitPane6.setPreferredSize(new java.awt.Dimension(700, 80));
 
         jButton4.setText("Rimuovi Ticker Selezionato");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -203,7 +205,9 @@ public class ViewTicker extends javax.swing.JFrame {
         });
         jSplitPane6.setTopComponent(jButton4);
 
-        jTextField3.setText("jTextField3");
+        jTextField3.setEditable(false);
+        jTextField3.setMinimumSize(new java.awt.Dimension(700, 30));
+        jTextField3.setPreferredSize(new java.awt.Dimension(700, 30));
         jSplitPane6.setRightComponent(jTextField3);
 
         jSplitPane5.setRightComponent(jSplitPane6);
@@ -214,11 +218,11 @@ public class ViewTicker extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+            .addComponent(jSplitPane2)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
         );
 
         pack();
