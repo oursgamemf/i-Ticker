@@ -30,6 +30,7 @@ import static controller.TickerController.sortTicker;
 import java.awt.BorderLayout;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -255,12 +256,18 @@ public class ViewTicker extends javax.swing.JFrame {
 //            {null, null, null, null}
 //        };
         JTable table = new javax.swing.JTable();
-        table.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
+        table.setModel(new javax.swing.table.DefaultTableModel(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return !(column == 0 || column == 1);
+            }
+        });
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setVisible(true);
         table.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.getViewport().add(table);
         table.setFillsViewportHeight(true);
+
         return table;
     }
 
@@ -445,22 +452,76 @@ public class ViewTicker extends javax.swing.JFrame {
         public void editingCanceled(ChangeEvent e) {
             System.out.println("The user canceled editing.");
         }
-        
+
         public void editingStopped(ChangeEvent e) {
-            // Virgy devi scrivere qui le cose che succedono quando si modifica una cella <3
-            System.out.println("The user stopped editing successfully.");
-            
-            // Risalire alla riga modificata
-            
-            // Creare un nuovo oggetto RowChoosenTks
-            
-            // Inserite i dati della riga nell'oggetto
-            
-            // Cancellare la vecchia riga
-            
-            // Inserire quella nuova
+            int[] cols = myTable.getSelectedColumns();
+            int[] rows = myTable.getSelectedRows();
+            if ((cols.length > 1) || (rows.length > 1)) {
+                System.out.println("Selezionare una sola riga durante l'editing");
+            } else {
+                int col = cols[0];
+                int row = rows[0];
+                // Inserite i dati della riga nell'oggetto
+                RowChoosenTks newRowChoosTks = createRCTfromRowint(row,col);
+                if (newRowChoosTks == null){
+                    fillTableFromDB(choosedTKTable, myStmtDB, myTable);
+                    return;
+                }
+                // Cancellare la vecchia riga
+                int tkCol = myTable.getColumnModel().getColumnIndex("Codice");
+                String tks2Remove = myTable.getModel().getValueAt(row, tkCol).toString();
+                DefaultTableModel model = (DefaultTableModel) myTable.getModel();
+                model.removeRow(row);
+                myStmtDB.delChoosenTKrow(choosedTKTable, tks2Remove);
+                // Inserire quella nuova
+                ArrayList<RowChoosenTks> information = new ArrayList<>();
+                information.add(newRowChoosTks);
+                Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
+                fillTableFromDB(choosedTKTable, myStmtDB, myTable);
+            }
         }
     };
+
+    private RowChoosenTks createRCTfromRowint(int modifiedRow, int modifiedCol) {
+        String colName = myTable.getColumnModel().getColumn(modifiedCol).toString();
+        System.out.println("riga: " + modifiedCol);
+        System.out.println("colonna: " + modifiedRow);
+
+        // Creare un nuovo oggetto RowChoosenTks
+        RowChoosenTks newRowChoosTks = new RowChoosenTks();
+
+        // Inserite i dati della riga nell'oggetto
+        String nameTk = myTable.getModel().getValueAt(modifiedRow, 0).toString();
+        newRowChoosTks.setTickerName(nameTk);
+
+        String dateTkSt = myTable.getModel().getValueAt(modifiedRow, 1).toString();
+        Date dateTk = Date.valueOf(dateTkSt);
+        newRowChoosTks.setLastDownloadDate(dateTk);
+
+        String refTkSt = myTable.getModel().getValueAt(modifiedRow, 2).toString().toLowerCase();
+        Boolean autRef = false;
+        if (refTkSt.trim().equals("true")) {
+            autRef = true;
+            newRowChoosTks.setAutomaticRefresh(autRef);
+        } else if (refTkSt.trim().equals("false")) {
+            autRef = false;
+            newRowChoosTks.setAutomaticRefresh(autRef);
+        } else {
+            String outMsg2 = "Update annullato: nella colonna \'Auto-Download\' è possibile inserire solo i valori \'true\' o \'false\'";
+            System.out.println(outMsg2);
+            return null;
+        }
+        String perTkSt = myTable.getModel().getValueAt(modifiedRow, 3).toString().toLowerCase().trim();
+        try {
+            int perTk = Integer.parseInt(perTkSt);
+            newRowChoosTks.setRefreshPeriod(perTk);
+        } catch (NumberFormatException notNumber) {
+            String outMsg3 = "Update annullato: nella colonna \'Periodo\' è possibile inserire solo cifre da 0 a 9";
+            System.out.println(outMsg3);
+            return null;
+        }
+        return newRowChoosTks;
+    }
 
     /**
      * @param args the command line arguments
