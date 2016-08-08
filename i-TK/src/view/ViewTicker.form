@@ -100,7 +100,9 @@
         </Container>
         <Container class="javax.swing.JSplitPane" name="jSplitPane5">
           <Properties>
-            <Property name="dividerLocation" type="int" value="230"/>
+            <Property name="dividerLocation" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="200" type="code"/>
+            </Property>
             <Property name="orientation" type="int" value="0"/>
           </Properties>
           <Constraints>
@@ -156,6 +158,9 @@
             <Container class="javax.swing.JSplitPane" name="jSplitPane6">
               <Properties>
                 <Property name="orientation" type="int" value="0"/>
+                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[2147483647, 80]"/>
+                </Property>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[700, 80]"/>
                 </Property>
@@ -174,6 +179,7 @@
                 <Component class="javax.swing.JButton" name="jButton4">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Rimuovi Ticker Selezionato"/>
+                    <Property name="alignmentY" type="float" value="0.0"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton4ActionPerformed"/>
@@ -187,6 +193,10 @@
                 <Component class="javax.swing.JTextField" name="jTextField3">
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
+                    <Property name="alignmentY" type="float" value="0.0"/>
+                    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[2147483647, 30]"/>
+                    </Property>
                     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[700, 30]"/>
                     </Property>

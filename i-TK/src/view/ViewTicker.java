@@ -175,7 +175,7 @@ public class ViewTicker extends javax.swing.JFrame {
 
         jSplitPane2.setTopComponent(jSplitPane3);
 
-        jSplitPane5.setDividerLocation(230);
+        jSplitPane5.setDividerLocation(200);
         jSplitPane5.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -194,10 +194,12 @@ public class ViewTicker extends javax.swing.JFrame {
         jSplitPane5.setTopComponent(jScrollPane1);
 
         jSplitPane6.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane6.setMaximumSize(new java.awt.Dimension(2147483647, 80));
         jSplitPane6.setMinimumSize(new java.awt.Dimension(700, 80));
         jSplitPane6.setPreferredSize(new java.awt.Dimension(700, 80));
 
         jButton4.setText("Rimuovi Ticker Selezionato");
+        jButton4.setAlignmentY(0.0F);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -206,6 +208,8 @@ public class ViewTicker extends javax.swing.JFrame {
         jSplitPane6.setTopComponent(jButton4);
 
         jTextField3.setEditable(false);
+        jTextField3.setAlignmentY(0.0F);
+        jTextField3.setMaximumSize(new java.awt.Dimension(2147483647, 30));
         jTextField3.setMinimumSize(new java.awt.Dimension(700, 30));
         jTextField3.setPreferredSize(new java.awt.Dimension(700, 30));
         jSplitPane6.setRightComponent(jTextField3);
@@ -272,6 +276,7 @@ public class ViewTicker extends javax.swing.JFrame {
         jScrollPane2.getViewport().add(table);
         table.setFillsViewportHeight(true);
 
+        table.putClientProperty("terminateEditOnFocusLost", true);
         return table;
     }
 
@@ -335,6 +340,8 @@ public class ViewTicker extends javax.swing.JFrame {
         for (String tk : Tks2Remove) {
             myStmtDB.delChoosenTKrow(choosedTKTable, tk);
         }
+        
+        fillTableFromDB(choosedTKTable, myStmtDB, myTable);
 
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -454,14 +461,16 @@ public class ViewTicker extends javax.swing.JFrame {
 
     CellEditorListener ChangeNotification = new CellEditorListener() {
         public void editingCanceled(ChangeEvent e) {
-            System.out.println("The user canceled editing.");
+            fillTableFromDB(choosedTKTable, myStmtDB, myTable);
+            OutputMessage.setOutputText("The user canceled editing", jTextField3);
         }
 
         public void editingStopped(ChangeEvent e) {
             int[] cols = myTable.getSelectedColumns();
             int[] rows = myTable.getSelectedRows();
             if ((cols.length > 1) || (rows.length > 1)) {
-                System.out.println("Selezionare una sola riga durante l'editing");
+                OutputMessage.setOutputText("Selezionare una sola riga durante l'editing", jTextField3, 1);
+                //System.out.println("Selezionare una sola riga durante l'editing");
             } else {
                 int col = cols[0];
                 int row = rows[0];
@@ -488,8 +497,8 @@ public class ViewTicker extends javax.swing.JFrame {
 
     private RowChoosenTks createRCTfromRowint(int modifiedRow, int modifiedCol) {
         String colName = myTable.getColumnModel().getColumn(modifiedCol).toString();
-        System.out.println("riga: " + modifiedCol);
-        System.out.println("colonna: " + modifiedRow);
+        //System.out.println("riga: " + modifiedCol);
+        //System.out.println("colonna: " + modifiedRow);
 
         // Creare un nuovo oggetto RowChoosenTks
         RowChoosenTks newRowChoosTks = new RowChoosenTks();
@@ -512,7 +521,8 @@ public class ViewTicker extends javax.swing.JFrame {
             newRowChoosTks.setAutomaticRefresh(autRef);
         } else {
             String outMsg2 = "Update annullato: nella colonna \'Auto-Download\' è possibile inserire solo i valori \'true\' o \'false\'";
-            System.out.println(outMsg2);
+            OutputMessage.setOutputText(outMsg2, jTextField3, 1);
+            //System.out.println(outMsg2);
             return null;
         }
         String perTkSt = myTable.getModel().getValueAt(modifiedRow, 3).toString().toLowerCase().trim();
@@ -521,9 +531,11 @@ public class ViewTicker extends javax.swing.JFrame {
             newRowChoosTks.setRefreshPeriod(perTk);
         } catch (NumberFormatException notNumber) {
             String outMsg3 = "Update annullato: nella colonna \'Periodo\' è possibile inserire solo cifre da 0 a 9";
-            System.out.println(outMsg3);
+            OutputMessage.setOutputText(outMsg3, jTextField3, 1);
+            //System.out.println(outMsg3);
             return null;
         }
+        OutputMessage.setOutputText("Update dei parametri relativi a " + nameTk + " eseguito correttamente", jTextField3);
         return newRowChoosTks;
     }
 
