@@ -340,7 +340,7 @@ public class ViewTicker extends javax.swing.JFrame {
         for (String tk : Tks2Remove) {
             myStmtDB.delChoosenTKrow(choosedTKTable, tk);
         }
-        
+        OutputMessage.setOutputText("", jTextField3);
         fillTableFromDB(choosedTKTable, myStmtDB, myTable);
 
     }//GEN-LAST:event_jButton4ActionPerformed
@@ -470,6 +470,7 @@ public class ViewTicker extends javax.swing.JFrame {
             int[] rows = myTable.getSelectedRows();
             if ((cols.length > 1) || (rows.length > 1)) {
                 OutputMessage.setOutputText("Selezionare una sola riga durante l'editing", jTextField3, 1);
+                fillTableFromDB(choosedTKTable, myStmtDB, myTable);
                 //System.out.println("Selezionare una sola riga durante l'editing");
             } else {
                 int col = cols[0];

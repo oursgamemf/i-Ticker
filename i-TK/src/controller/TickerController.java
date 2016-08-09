@@ -169,32 +169,32 @@ public class TickerController {
                         break;
                     case "open":
                         Double openVal = Double.valueOf(datas.get(row).get(col));
-                        openVal = openVal * Math.random();
+                        //openVal = openVal * Math.random();
                         myRowTicker.setOpenTk(openVal);
                         break;
                     case "high":
                         Double highVal = Double.valueOf(datas.get(row).get(col));
-                        highVal = highVal * Math.random();
+                        //highVal = highVal * Math.random();
                         myRowTicker.setHighTk(highVal);
                         break;
                     case "low":
                         Double lowVal = Double.valueOf(datas.get(row).get(col));
-                        lowVal = lowVal * Math.random();
+                        //lowVal = lowVal * Math.random();
                         myRowTicker.setLowTk(lowVal);
                         break;
                     case "close":
                         Double closeVal = Double.valueOf(datas.get(row).get(col));
-                        closeVal = closeVal * Math.random();
+                        //closeVal = closeVal * Math.random();
                         myRowTicker.setCloseTk(closeVal);
                         break;
                     case "volume":
                         Double volumeVal = Double.valueOf(datas.get(row).get(col));
-                        volumeVal = volumeVal * Math.random();
+                        //volumeVal = volumeVal * Math.random();
                         myRowTicker.setVolumeTk(volumeVal);
                         break;
                     case "adj close":
                         Double adjCloseVal = Double.valueOf(datas.get(row).get(col));
-                        adjCloseVal = adjCloseVal * Math.random();
+                        //adjCloseVal = adjCloseVal * Math.random();
                         myRowTicker.setAdjCloseTk(adjCloseVal);
                         break;
                 }

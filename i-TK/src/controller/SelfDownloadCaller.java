@@ -33,7 +33,7 @@ public class SelfDownloadCaller {
                         Boolean someOneNeedUpDate = updateChTKsetTRUE(tableDBName, myDB, vt); 
                         if (!someOneNeedUpDate)
                             System.out.println("No Ticker set to be updated");
-                        Thread.sleep(86400000);
+                        Thread.sleep(10800000);     // 24 ore: 86400000
                     } catch (InterruptedException e) {
                         return;
                     }
