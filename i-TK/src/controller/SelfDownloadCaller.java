@@ -30,10 +30,10 @@ public class SelfDownloadCaller {
                 while (count-- > 0) {
                     System.out.println(mesg);
                     try {
-                        Thread.sleep(50000);
                         Boolean someOneNeedUpDate = updateChTKsetTRUE(tableDBName, myDB, vt); 
                         if (!someOneNeedUpDate)
                             System.out.println("No Ticker set to be updated");
+                        Thread.sleep(86400000);
                     } catch (InterruptedException e) {
                         return;
                     }
@@ -60,7 +60,7 @@ public class SelfDownloadCaller {
             System.out.println(sdf.format(cal.getTime()));
             System.out.println(sdf.format(nowDate.getTime()));
             System.out.println("-----------");
-            if (!cal.before(nowDate)){
+            if (cal.before(nowDate)){
                 vt.downloadTickerForUpdate(rct.getTickerName()); // Deve aggiornare la data ultimo DWL + sysDate
                 System.out.println("Ticker " + rct.getTickerName() +  " Updated");
             }

@@ -4,6 +4,7 @@ package model;
  * @author emanuele
  */
 import com.sun.rowset.CachedRowSetImpl;
+import controller.OutputMessage;
 import controller.RowChoosenTks;
 import controller.RowTicker;
 import java.sql.Connection;
@@ -165,7 +166,8 @@ public class DBtkEvo {
 
             return true;
         } catch (SQLException ex) {
-            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Tabella importata");
         }
         return false;
     }
@@ -182,7 +184,8 @@ public class DBtkEvo {
 
             return true;
         } catch (SQLException ex) {
-            Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(DBtkEvo.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Tabella importata");
         }
         return false;
     }
