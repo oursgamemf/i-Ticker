@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -6,7 +7,6 @@
 package controller;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -47,8 +47,9 @@ public class SelfDownloadCaller {
 
     public Boolean updateChTKsetTRUE(String tableDBName, DBtkEvo myDB, ViewTicker vt) {
         ArrayList<RowChoosenTks> allChosenTKsToBeDWL = myDB.getAllRowChoosenDownlodableDBData(tableDBName);
+        Boolean someOneToUpdate = false;
         if (allChosenTKsToBeDWL.size() < 1) {
-            return false;
+            return someOneToUpdate;
         }
         for (RowChoosenTks rct : allChosenTKsToBeDWL) {
             Calendar cal = new GregorianCalendar();
@@ -67,9 +68,9 @@ public class SelfDownloadCaller {
             else {
                 System.out.println("Still not time to Update " + rct.getTickerName());             
             }
-            return true;
+            someOneToUpdate = true;
         }
         
-        return false;
+        return someOneToUpdate;
     }
 }

@@ -3,8 +3,7 @@ package model;
 /**
  * @author emanuele
  */
-import com.sun.rowset.CachedRowSetImpl;
-import controller.OutputMessage;
+
 import controller.RowChoosenTks;
 import controller.RowTicker;
 import java.sql.Connection;
@@ -20,27 +19,26 @@ import java.util.Calendar;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.rowset.CachedRowSet;
 import javax.swing.table.DefaultTableModel;
 
 public class DBtkEvo {
 
     private static String sDBname;// = "tk";
     private static final String sJdbc = "org.sqlite.JDBC";
-    private static String sDbUrl = "jdbc:sqlite:";
+    private static final String sDbUrl = "jdbc:sqlite:";
     private static final String DB_EXTENSION = ".db";
     private static int iTimeout = 30;
-    private static String sDropTable = "DROP TABLE ";
+    private static final String sDropTable = "DROP TABLE ";
     private static String sFieldTableCreate;
     private static String sTable;
-    private static String sMakeTable = "CREATE TABLE ";
+    private static final String sMakeTable = "CREATE TABLE ";
     private static String sInsertWhere;
     private static String sInsertValue;
     private static String sMakeInsert = "INSERT INTO " + sDBname + "(" + sInsertWhere + ")" + " VALUES(" + sInsertValue + ")";
     private static String query = null;
     private static final String INSERT = "INSERT INTO ";
     private static final String SELECT_ALL = "SELECT * FROM ";
-    private static String ALREADY_IN_DB = "SELECT tk_name FROM ? WHERE tk_name = '?' ";
+    private static final String ALREADY_IN_DB = "SELECT tk_name FROM ? WHERE tk_name = '?' ";
 
     public RowChoosenTks checkIfAlreadyIn(String tableName, String tkName) {
         Connection conn = connectOrCreate();

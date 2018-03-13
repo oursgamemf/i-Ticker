@@ -27,21 +27,13 @@ import javax.swing.JFileChooser;
 import controller.RowChoosenTks;
 import controller.SelfDownloadCaller;
 import static controller.TickerController.sortTicker;
-import java.awt.BorderLayout;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.plaf.basic.BasicOptionPaneUI;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 
 /**
  *
@@ -259,7 +251,7 @@ public class ViewTicker extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private JTable setTableAtStart() {
-        String[] columnNames = {"Codice", "Ultimo Download", "Auto-Download", "Periodo"};
+        String[] columnNames = {"Codice", "Ultimo Download", "Auto-Download", "Aggiorna ogni: [gg]"};
         Object[][] data = {};
 //            {null, null, null, null}
 //        };

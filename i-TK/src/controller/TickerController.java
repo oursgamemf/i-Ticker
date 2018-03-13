@@ -5,6 +5,7 @@
  */
 package controller;
 
+import com.sun.org.apache.xpath.internal.operations.Equals;
 import static controller.ManageExcel.getColNumFromTxt;
 import static controller.ManageExcel.getHeaderList;
 import java.io.File;
@@ -27,8 +28,17 @@ import java.util.Calendar;
 import model.DBtkEvo;
 import org.apache.commons.io.FileUtils;
 import static controller.ManageExcel.getAllDataFromFile;
+import java.io.FileWriter;
+import java.net.URLConnection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JTextField;
+import yahoofinance.Stock;
+import yahoofinance.YahooFinance;
+import yahoofinance.histquotes.Interval;
 
 /**
  * @author emanuele
@@ -41,8 +51,9 @@ public class TickerController {
     private static final String PATH_TO_CSV = "table.csv";
     private static final String PATH_TO_DWL = "myDwlFile.csv";
     private static final String PATH_TO_XLS = "renameME.xls";
-    private static final String URL_TO_SRC_DATA = "http://real-chart.finance.yahoo.com/table.csv?s=";//=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
+    private static final String URL_TO_SRC_DATA = "https://query1.finance.yahoo.com/v7/finance/download/";//=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
     private static final String FULL_TEST_URL = "http://real-chart.finance.yahoo.com/table.csv?s=PHAU.MI&a=05&b=20&c=2007&d=06&e=21&f=2016&g=m&ignore=.csv";
+    // https://query1.finance.yahoo.com/v7/finance/download/PHAU.MI?period1=1463691956&period2=1495227956&interval=1mo&events=history&crumb=ZaS4/cgjQp5
     private static final String opSys = System.getProperty("os.name");
     private static final Path curPath = Paths.get(System.getProperty("user.dir"));
     private static final String insideFullPath = curPath.toString() + File.separator;//curPath.getParent().toString() + File.separator
@@ -87,6 +98,30 @@ public class TickerController {
 
     }
 
+    public static Stock testYahooAPI() throws IOException {
+        Calendar from = Calendar.getInstance();
+        Calendar to = Calendar.getInstance();
+        from.add(Calendar.YEAR, -100); // from 5 years ago
+
+        Stock google = YahooFinance.get("PHAU.MI", from, to, Interval.MONTHLY);
+        return google;
+    }
+
+    public static Stock yahooAPI(String nameTk) throws IOException {
+        Calendar from = Calendar.getInstance();
+        Calendar to = Calendar.getInstance();
+        //from.add(Calendar.YEAR, -10); // from 5 years ago
+        from.set(1800, 01, 01);
+        /*
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        System.out.println(from.getTime().toString());
+        System.out.println(to.getTime().toString());
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        */
+        Stock google = YahooFinance.get(nameTk, from, to, Interval.MONTHLY);
+        return google;
+    }
+
     public static boolean getWebConnection() {
         try {
             //make a URL to a known source
@@ -94,7 +129,7 @@ public class TickerController {
             //open a connection to that source
             HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
             //trying to retrieve data from the source. If there is no connection, this line will fail
-            Object objData = urlConnect.getContent();
+            //Object objData = urlConnect.getContent();
 
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
@@ -125,7 +160,7 @@ public class TickerController {
         sessionDB.setsTable(configData.get(1).get(1));
         sessionDB.setsFieldTableCreate(configData.get(2).get(1));
         sessionDB.setQuery(configData.get(3).get(1));
-        
+
         sessionDB.connectOrCreate();
         //sessionDB.dropTable(); // Remove it!!!
         sessionDB.createTable();
@@ -147,6 +182,7 @@ public class TickerController {
         loadSet.add(configData.get(8).get(1));
         return loadSet;
     }
+
 
     public static ArrayList<RowTicker> getRowTickerArray(ArrayList<ArrayList<String>> datas) {
         // Return an Array whose elements are instances of the class RowTicker.
@@ -213,7 +249,7 @@ public class TickerController {
     public static String makeURL(String tk) {
         // Compose full URL
         String url = URL_TO_SRC_DATA + tk;
-        url = url + "&a=01&b=01&c=1900&d=12&e=12&f=2116&g=m&ignore=.csv";
+        url = url + "PHAU.MI?period1=1182290400&period2=4085589600&interval=1d&events=history&crumb=ol06Q2/dGli";
         return url;
     }
 
@@ -266,41 +302,176 @@ public class TickerController {
         }
         return rctAlreadyIn;
     }
-    
-     public static RowChoosenTks updateTkChoosenInOBJ(RowChoosenTks rct) {
+
+    public static RowChoosenTks updateTkChoosenInOBJ(RowChoosenTks rct) {
         if (rct != null) {
             Date a = new Date(Calendar.getInstance().getTime().getTime());
             java.sql.Date sysDate = new java.sql.Date(a.getTime());
             rct.setLastDownloadDate(sysDate);
-            System.out.println("Date Updated");
+            // System.out.println("Date Updated");
             return rct;
         }
         return null;
     }
-     
+
+    public static void writeLine(FileWriter w, String[] values, char separators, char endLine) {
+
+        StringBuilder sb = new StringBuilder();
+        for (String value : values) {
+            sb.append(value);
+            sb.append(separators);
+        }
+        sb.delete(sb.length() - 1, sb.length());
+        sb.append(endLine);
+        try {
+            w.append(sb.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    public static boolean notNullInThisRow(String[] a){
+        for(String b:a ){
+            if(b.equals("null")){
+                return false;
+            }
+            
+        }
+        return true;
+    }
+    
+    public static List<String[]> getMatrixData(Stock tkStock){
+        
+        //String[] mtStr = null;// {"asd","d","f","ff","vv"};
+        List<String[]> tkDataMatrix = new ArrayList<String[]>();
+        //tkDataMatrix.add(mtStr);
+        try {       
+            List myTKList = tkStock.getHistory();
+            String[] oneDate;
+            for(Object a : myTKList){
+                oneDate = a.toString().split("[-,> ():]");
+                tkDataMatrix.add(oneDate);                    
+            }
+            
+        }   catch (IOException ex) {
+            System.out.println("error getting data");
+        }
+        
+        List<String[]> outData = new ArrayList<String[]>();
+        String[] temp = null;
+        boolean passEmpty = false;
+        int indexTmp = 1;
+        while(!passEmpty){
+            if ((tkDataMatrix.get(indexTmp).length != 0) &&  notNullInThisRow(tkDataMatrix.get(indexTmp)) ){
+                temp = tkDataMatrix.get(indexTmp);
+                passEmpty = true;
+                break;
+            }
+            indexTmp++;
+        }
+        /*
+        for (String[] a : tkDataMatrix.subList(indexTmp, tkDataMatrix.size())){
+            System.out.println("--------------");
+            for (String b : a){
+                System.out.print(b + " ");
+            }
+            System.out.println("--------------");
+        }
+        */
+        for (String[] a : tkDataMatrix.subList(indexTmp, tkDataMatrix.size())){
+            int counter = 0;
+        
+            List<String> row = new ArrayList<String>();
+            for (String b : a){
+                
+                if (b.equals("null") && (temp[counter].equals("null")|| temp.equals(null) )){
+                    b = "-1";                 
+                }
+                
+                if (b.equals("null") && !temp.equals("null")){
+                    b = temp[counter];                 
+                }
+                
+                if(counter == 0){
+                   b = b.replaceAll("[^\\d.]", "");
+                    b = b.replaceAll("[.]", "");
+                }
+                if (b.matches(".*\\d+.*")){
+                    row.add(b);
+                }
+                if (!b.equals("null") && !temp.equals("null")){
+                    temp[counter] = b;
+                    
+                }
+                counter ++;
+                
+            }
+            String[] arrayRow = new String[] { row.get(0).toString()+"-"+row.get(1).toString()+"-"+row.get(2).toString(),
+                row.get(5).toString(), row.get(4).toString(), row.get(3).toString(),
+                row.get(6).toString(), "0", row.get(7).toString() };
+            outData.add(arrayRow);
+            
+        }
+        
+        return outData;
+    }
+    
+    public static boolean writeCSV(String filename, List<String[]> sourceData) {
+
+        char DEFAULT_SEPARATOR = ',';
+        try {
+            FileWriter fw = new FileWriter(filename);
+            String[] header = {"Date", "Open", "High", "Low", "Close", "Volume", "Adj close"};
+
+            TickerController.writeLine(fw, header, DEFAULT_SEPARATOR, '\n');
+            for (String[] st : sourceData) {
+                TickerController.writeLine(fw, st, DEFAULT_SEPARATOR, '\n');
+            }
+            fw.close();
+            ////////////
+        } catch (IOException ex) {
+            Logger.getLogger(TickerController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+            // System.out.println("Unable to write CSV.");
+            String outMsg = "Impossibile scrivere il file: \'" + "\'. Ticker non valido";        
+        }
+        return false;
+    }
+    
+    
+    // public static void 
     public static void searchSaveTK(String fileUrl, String nameTK, JTextField txtField) {
         //Code to download
         InputStream input;
         String pathNameDwlCSV = insideFullPath + nameTK.trim() + ".csv";
         File myFile = new File(pathNameDwlCSV);
-
         try {
-            URL myUrl = new URL(fileUrl);
-            input = myUrl.openStream();
-            FileUtils.copyURLToFile(myUrl, myFile);
-            Reader reader = new InputStreamReader(input, "UTF-8");
+            Stock myTKdatas = yahooAPI(nameTK);
+            List<String[]> outputdata = getMatrixData(myTKdatas);
+            writeCSV(pathNameDwlCSV, outputdata);        
 
-        } catch (MalformedURLException ex) {
-            // Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unable to find this Ticker, correct it please.");
-            String outMsg = "Impossibile scaricare il file: \'" + nameTK + "\'. Ticker non valido";
-            OutputMessage.setOutputText(outMsg, txtField, 2);
         } catch (IOException ex) {
-            Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unable to find this Ticker, correct it please1.");
+            Logger.getLogger(TickerController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+            // ("Unable to find this Ticker, correct it please.");
             String outMsg = "Impossibile scaricare il file: \'" + nameTK + "\'. Ticker non valido";
             OutputMessage.setOutputText(outMsg, txtField, 2);
         }
+
+        try {
+            URL myUrl = new URL(fileUrl);
+            //input = myUrl.openStream();
+            //FileUtils.copyURLToFile(myUrl, myFile);
+            //Reader reader = new InputStreamReader(input, "UTF-8");
+
+        } catch (MalformedURLException ex) {
+            // Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+            // System.out.println("Unable to find this Ticker, correct it please.");
+            String outMsg = "Impossibile scaricare il file: \'" + nameTK + "\'. Ticker non valido";
+            OutputMessage.setOutputText(outMsg, txtField, 2);
+
+        } 
 
     }
 
@@ -338,7 +509,5 @@ public class TickerController {
         });
         return myAnnualTicker;
     }
-    
- 
 
 }
